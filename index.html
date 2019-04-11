@@ -2,7 +2,7 @@
 <html lang="zh-CN">
     <head>
         <meta charset="utf-8">
-        <title>Rainyday-{{=it.title}}</title>
+        <title>凯哥的个人主页</title>
         <meta name="Description" content="{{=it.desc}}" />
 		<meta name="Keywords" content="{{=it.keywords}}" />
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
@@ -16,9 +16,9 @@
             }
         </style>
     </head>
-    <body onload="run();" class="rain">
-        <img id="background" alt="rainmood" src="" />
-        <audio src="/static/rainymood.m4a" autoplay="autoplay" loop="loop">您的浏览器不支持 audio</audio>
+    <body class="rain">
+        <img id="background" alt="rainmood"  />
+        <audio src="https://dev.tencent.com/api/project/4311506/files/4971476/download" autoplay="autoplay" loop="loop">您的浏览器不支持 audio</audio>
         <script src="/static/js/rainyday.min.js"></script>
         <script>
             function run() {
@@ -32,6 +32,7 @@
                 image.crossOrigin = 'anonymous';
                 image.src = '/static/img/bg.jpg';
             }
+			window.onload = run;
         </script>
     </body>
 </html>
