@@ -1,38 +1,37 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8">
-        <title>凯哥的个人网站</title>
-        <meta name="Description" content="{{=it.desc}}" />
-		<meta name="Keywords" content="{{=it.keywords}}" />
+	<head>
+		<meta charset="utf-8">
+		<title>凯哥的个人网站</title>
+		<link rel="icon" href="static/img/favicon.png" type="image/png" />
+		<link rel="shortcut icon" href="static/img/favicon.png" type="image/png" />
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-		<link rel="stylesheet" type="text/css" href="/static/css/style.css" />
-        <style media="screen">
-            html,body {
-                overflow: hidden;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
-        </style>
-    </head>
-    <body class="rain">
-        <img id="background" alt="rainmood" crossorigin="anonymous" />
-        <audio src="https://m701.music.126.net/20190413114028/abed98c59788cb3d69569ee8f44264a7/jdyyaac/535d/565c/545f/d73e78197aa6fdfb6853c59f6d3d05a6.m4a" crossorigin="anonymous"  autoplay="autoplay" loop="loop">您的浏览器不支持 audio</audio>
-        <script src="/static/js/rainyday.min.js"></script>
-        <script>
-            function run() {
-                var image = document.getElementById('background');
-                image.onload = function() {
-                    var engine = new RainyDay({
-                        image: this
-                    });
-					engine.rain([ [3, 2, 2] ], 100);
-				};
-                image.crossOrigin = 'anonymous';
-                image.src = '/static/img/bg.jpg';
-            }
-			window.onload = run;
-        </script>
-    </body>
+		<link rel="stylesheet" type="text/css" href="static/css/style.css" />
+		<style media="screen">
+			html,
+			body {
+				overflow: hidden;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body class="rain">
+		<img id="background" src="static/img/bg.jpg" alt="rainmood" crossorigin="anonymous" />
+		<audio src="http://m10.music.126.net/20190413123325/355b3de27e62dd13807929a0ea54c77d/ymusic/cfb4/dffb/85ea/e8a14eedcc2949d9cfc260bfe6aad794.mp3"
+		 crossorigin="anonymous" autoplay="autoplay" loop="loop">您的浏览器不支持 audio</audio>
+		<script src="static/js/rainyday.min.js"></script>
+		<script>
+			var image = document.getElementById('background');
+			image.onload = function() {
+				var engine = new RainyDay({
+					image: this
+				});
+				engine.rain([
+					[3, 2, 2]
+				], 100);
+			};
+		</script>
+	</body>
 </html>
