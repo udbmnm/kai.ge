@@ -16,22 +16,21 @@
 				padding: 0;
 			}
 		</style>
-	</head>
-	<body class="rain">
-		<img id="background" src="static/img/bg.jpg" alt="rainmood" crossorigin="anonymous" />
-		<audio src="http://m10.music.126.net/20190413123325/355b3de27e62dd13807929a0ea54c77d/ymusic/cfb4/dffb/85ea/e8a14eedcc2949d9cfc260bfe6aad794.mp3"
-		 crossorigin="anonymous" autoplay="autoplay" loop="loop">您的浏览器不支持 audio</audio>
 		<script src="static/js/rainyday.min.js"></script>
 		<script>
-			var image = document.getElementById('background');
-			image.onload = function() {
+			function run() {
 				var engine = new RainyDay({
-					image: this
+					image: document.getElementById('background')
 				});
 				engine.rain([
 					[3, 2, 2]
 				], 100);
-			};
+			}
 		</script>
+	</head>
+	<body class="rain">
+		<img id="background" src="static/img/bg.jpg" alt="rainmood" onload="run()" crossorigin="anonymous" />
+		<audio src="http://m10.music.126.net/20190413123325/355b3de27e62dd13807929a0ea54c77d/ymusic/cfb4/dffb/85ea/e8a14eedcc2949d9cfc260bfe6aad794.mp3"
+		 crossorigin="anonymous" autoplay="autoplay" loop="loop">您的浏览器不支持 audio</audio>
 	</body>
 </html>
