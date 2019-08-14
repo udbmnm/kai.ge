@@ -1,0 +1,91 @@
+body {
+	padding-top: 84px;
+}
+.pub-content {
+	width: 100%;
+}
+.editer {
+	position: relative;
+}
+.imgarea {
+	border: 2px dashed #ccc;
+	display: none;
+	position: relative;
+	min-height: 50px;
+}
+.imgarea .text-muted {
+	height: 50%;
+	position: absolute;
+	margin: auto;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+.imgbox {
+	height: 100%;
+	padding: 10px;
+}
+.imgbox .start {
+	position: absolute;
+	z-index: 10;
+	right: 10px;
+	bottom: 10px;
+}
+.filearea {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top:0;
+	opacity: 0;
+}
+.imgitem {
+	position: relative;
+	float: left;
+	z-index: 10;
+	margin-right: 5px;
+}
+.imgitem>img {
+	height:60px;
+	margin-bottom: 2px;
+}
+.imgitem>p {
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 80px;
+	text-overflow: ellipsis;
+}
+.imgitem .del {
+	position: absolute;
+	right: 0;
+	top:0;
+	display: none;
+}
+.imgitem:hover .del {
+	display: block;
+}
+.open {
+	background: #bbbbbb;
+}
+.hand {
+	cursor: pointer;
+}
+.percent {
+	margin-top: 10px;
+	position: relative;
+	z-index: 10;
+}
+.backup-list .btn {
+	display: none;
+}
+.backup-list>li:hover .btn {
+	display: block;
+}
+.loading {
+	-webkit-animation: spin 2s infinite linear;
+}
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(359deg); }
+}

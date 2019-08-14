@@ -1,0 +1,280 @@
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+p,
+ul,
+ol,
+li,
+pre,
+fieldset,
+button,
+input,
+textarea,
+th,
+td {
+	margin: 0;
+	padding: 0;
+}
+body,
+button,
+input,
+select,
+textarea {
+	font: 14px/1 "Lucida Grande", Tahoma, Helvetica, Arial, "\5b8b\4f53", sans-serif;
+}
+h1 {
+	font-size: 18px;
+}
+h2 {
+	font-size: 16px;
+}
+h3 {
+	font-size: 14px;
+}
+h4,
+h5,
+h6 {
+	font-size: 100%;
+}
+em {
+	font-style: normal;
+}
+code,
+pre {
+	font-family: "Courier New", Courier, monospace;
+}
+ul,
+ol {
+	list-style: none;
+}
+a {
+	text-decoration: none;
+	color: #428bca;
+}
+a:hover {
+	color: #2a6496;
+}
+fieldset,
+img {
+	border: none;
+}
+button,
+input,
+select,
+textarea {
+	font-size: 100%;
+}
+
+/*body {
+	background: url(/static/img/bg.jpg) fixed no-repeat;
+	background-size: 100%;
+}*/
+.clearfix:before, .clearfix:after {
+	display: table;
+	line-height: 0;
+	content: "";
+}
+
+.clearfix:after {
+	clear: both;
+}
+.fl {
+	float: left;
+}
+.fr {
+	float: right;
+}
+
+
+#wrapper {
+	padding-left: 220px;
+	transition: all 0.4s ease 0s;
+}
+#sidebar-wrapper {
+	margin-left: -220px;
+	left: 220px;
+	top:0;
+	background: rgba(255,255,255,.0);
+	position: fixed;
+	height: 100%;
+	z-index: 2;
+	transition: all 0.4s ease 0s;
+	box-shadow: 5px 5px 5px 0px #000;
+}
+
+#page-content-wrapper {
+	padding: 20px 20px 20px 30px;
+	background: rgba(255,255,255,0.7);
+	position: relative;
+	z-index: 2;
+}
+.sidebar-nav {
+	width: 220px;
+	margin: 0;
+	padding: 0;
+}
+.sidebar-nav li {
+	line-height: 40px;
+	text-align: center;
+}
+.sidebar-nav li a {
+	color: #fff;
+	display: block;
+}
+.sidebar-nav li a:hover {
+	color: #fff;
+	background: rgba(255, 255, 255, 0.2);
+}
+.sidebar-nav > .sidebar-brand {
+	font-size: 18px;
+}
+.sidebar-nav > .sidebar-brand a {
+	color: #fff;
+}
+.sidebar-nav > .sidebar-brand a:hover {
+	color: #80bd01;
+	background: none;
+}
+.avatar {
+	margin-top: 20px;
+}
+.avatar>img {
+	width: 110px;
+	height: 110px;
+	border-radius: 55px;
+	-webkit-transition: -webkit-transform 1s ease-in-out 0;
+	-webkit-transform: rotate(0);
+	-webkit-backface-visibility: hidden;
+}
+.avatar>img:hover {
+	-webkit-transform: rotate(720deg);
+}
+/* notes-list */
+
+.notes-list {
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.notes-list>li {
+	margin-bottom: 40px;
+}
+.notes-list .tit {
+	font-size: 22px;
+	border-bottom: 1px solid rgba(111, 111, 111, 0.1);
+	padding-bottom: 15px;
+}
+.notes-list .summary,.notes-list .content,.pages {
+	margin-top: 10px;
+	line-height: 34px;
+	color: #666;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.notes-list .content {
+	padding: 0 5px;
+}
+.content img {
+	display: block;
+	max-width: 100%;
+	margin: 10px auto;
+}
+.summary img {
+	max-width: 40%;
+}
+.detail .tit>a {
+	color: #ee6e2f;
+}
+.time {
+	display: inline-block;
+	margin: 10px 20px 10px 0;
+}
+.time,.views {
+	font-size: 14px;
+	color: #999;
+}
+
+/* pagination */
+
+.pagination {
+	margin-top: 10px;
+	text-align: right;
+}
+.pagination>a {
+	display: inline-block;
+	height: 30px;
+	padding: 0 10px;
+	text-align: center;
+	line-height: 30px;
+	border: 1px solid #ddd;
+	margin-left: -1px;
+	background:rgba(255,255,255,.5);;
+}
+.pagination>a:first-child {
+	border-top-left-radius: 2px;
+	border-bottom-left-radius: 2px;
+}
+.pagination>a:last-child {
+	border-top-right-radius: 2px;
+	border-bottom-right-radius: 2px;
+}
+.pagination .active {
+	background-color: #428bca;
+	border-color: #428bca;
+	color: #fff;
+}
+
+/* tags */
+.tags-list {
+	margin-top: 40px;
+	border-top: 1px dashed #ddd;
+	padding-top: 20px;
+}
+.tags-list>h3 {
+	color: #999;
+}
+.tags-list>h3,.tags {
+	display: inline-block;
+}
+.tags>a {
+	margin: 0 8px;
+}
+
+/* notfound */ 
+.notfound {
+	text-align: center;
+}
+.notfound>img {
+	margin: 20px 0;
+}
+.notfound>h2 {
+	font-size: 48px;	
+	color: #fff;
+}
+
+.ds-thread {
+	margin-top: 20px;
+}
+#ds-reset {
+	padding: 10px;
+	border-radius: 5px;
+}
+#ds-reset,#ds-thread #ds-reset .ds-header {
+	background: rgba(255,255,255,.5);
+}
+.rain {
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	left: 0;
+	top: 0;
+	z-index: 1;
+}
+.rain img {
+    width: 100%;
+    height: 100%;
+}
