@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="https://unpkg.com/dsteem@^0.8.0/dist/dsteem.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var client = new dsteem.Client('https://api.steemit.com')
+			client.database.getDiscussions('blog', {
+				tag: 'zhengkai',
+				limit: 10
+			}).then(function(discussions) {
+				document.body.innerHTML += '<h1>' + discussions[0].title + '</h1>'
+				document.body.innerHTML += '<h2>by ' + discussions[0].author + '</h2>'
+				document.body.innerHTML += '<pre style="white-space: pre-wrap">' + discussions[0].body + '</pre>'
+			})
+		</script>
+	</body>
+</html>
