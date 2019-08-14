@@ -9,7 +9,7 @@ paginate = 4                         # shows the number of articles  # 首页显
 enableEmoji = true
 googleAnalytics = ""                 # your google analytics id
 disqusShortname = ""                 # your discuss shortname
-
+publishdir = "./"
 [author]                             # essential                     # 必需
   name = "凯哥"
 
