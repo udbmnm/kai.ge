@@ -12,21 +12,12 @@
     
     
     <item>
-      <title>First</title>
-      <link>https://kai.ge/posts/111/</link>
+      <title>Vuex概念浓缩版记录</title>
+      <link>https://kai.ge/posts/vuex%E6%A6%82%E5%BF%B5%E6%B5%93%E7%BC%A9%E7%89%88%E8%AE%B0%E5%BD%95/</link>
       <pubDate>Wed, 14 Aug 2019 20:20:22 +0800</pubDate>
       
-      <guid>https://kai.ge/posts/111/</guid>
-      <description>11111 测试测试 11111</description>
-    </item>
-    
-    <item>
-      <title>First</title>
-      <link>https://kai.ge/posts/222/</link>
-      <pubDate>Wed, 14 Aug 2019 20:20:22 +0800</pubDate>
-      
-      <guid>https://kai.ge/posts/222/</guid>
-      <description>2222 测试测试 2222</description>
+      <guid>https://kai.ge/posts/vuex%E6%A6%82%E5%BF%B5%E6%B5%93%E7%BC%A9%E7%89%88%E8%AE%B0%E5%BD%95/</guid>
+      <description>state 读取store的字段值,通过this.$store.state访问 const Counter = { template: `&amp;lt;div&amp;gt;{{ count }}&amp;lt;/div&amp;gt;`, computed: { count () { return this.$store.state.count } } } mapState 辅助函数 当一个组件需要获取多个状态时候，将这些状态都声明为计算属性会有些重复和冗余。为了解决这</description>
     </item>
     
     <item>
