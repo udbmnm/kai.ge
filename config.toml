@@ -10,6 +10,7 @@ enableEmoji = true
 googleAnalytics = ""                 # your google analytics id
 disqusShortname = ""                 # your discuss shortname
 publishdir = "./"
+contentdir = "content"
 [author]                             # essential                     # 必需
   name = "凯哥"
 
