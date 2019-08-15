@@ -3,14 +3,30 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://kai.ge/about/</loc>
-    <lastmod>2018-12-29T20:24:28+08:00</lastmod>
+    <loc>https://kai.ge/posts/111/</loc>
+    <lastmod>2019-08-14T20:20:22+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/posts/</loc>
+    <lastmod>2019-08-14T20:20:22+08:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://kai.ge/</loc>
-    <lastmod>2018-12-29T20:24:28+08:00</lastmod>
+    <lastmod>2019-08-14T20:20:22+08:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/about/</loc>
+    <lastmod>2019-08-14T20:19:43+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/about/</loc>
+    <lastmod>2018-12-29T20:24:28+08:00</lastmod>
   </url>
   
   <url>

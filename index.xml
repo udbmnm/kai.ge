@@ -6,10 +6,28 @@
     <description>Recent content on 凯哥的个人网站</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 29 Dec 2018 20:24:28 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 14 Aug 2019 20:20:22 +0800</lastBuildDate>
     
 	<atom:link href="https://kai.ge/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>First</title>
+      <link>https://kai.ge/posts/111/</link>
+      <pubDate>Wed, 14 Aug 2019 20:20:22 +0800</pubDate>
+      
+      <guid>https://kai.ge/posts/111/</guid>
+      <description>11111 测试测试 112</description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>https://kai.ge/about/</link>
+      <pubDate>Wed, 14 Aug 2019 20:19:43 +0800</pubDate>
+      
+      <guid>https://kai.ge/about/</guid>
+      <description>正文内容</description>
+    </item>
     
     <item>
       <title>关于</title>
