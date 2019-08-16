@@ -1,6 +1,7 @@
 ---
 title: "Vuex概念浓缩版记录"
 date: 2019-05-29T20:20:22+08:00
+tags: ["vuex"]
 ---
 
 ## state 

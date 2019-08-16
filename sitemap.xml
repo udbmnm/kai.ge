@@ -9,7 +9,19 @@
   </url>
   
   <url>
+    <loc>https://kai.ge/tags/</loc>
+    <lastmod>2019-08-16T16:20:22+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://kai.ge/</loc>
+    <lastmod>2019-08-16T16:20:22+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/tags/%E5%B0%8F%E7%A8%8B%E5%BA%8F/</loc>
     <lastmod>2019-08-16T16:20:22+08:00</lastmod>
     <priority>0</priority>
   </url>
@@ -25,17 +37,18 @@
   </url>
   
   <url>
+    <loc>https://kai.ge/tags/vuex/</loc>
+    <lastmod>2019-05-29T20:20:22+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://kai.ge/about/</loc>
     <lastmod>2018-12-29T20:24:28+08:00</lastmod>
   </url>
   
   <url>
     <loc>https://kai.ge/categories/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://kai.ge/tags/</loc>
     <priority>0</priority>
   </url>
   
