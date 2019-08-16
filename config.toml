@@ -60,8 +60,5 @@ contentdir = "content"
   visitor = true
 
 [social]
-  github = " "
-  twitter = " "
-  facebook = " "
-  weibo = " "
-  instagram = " "
+  github = "https://dev.tencent.com/u/f2e"
+  twitter = "https://twitter.com/udbmnm"
