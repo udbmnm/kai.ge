@@ -110,49 +110,69 @@
 </code></p>
 
 <pre><code class="language-javascript">handleRuleText (text, color) {
-    let textArr = [];
-    while (text.length) {
-        let startIndex = text.indexOf('&lt;b&gt;');
-        let endIndex = text.indexOf('&lt;/b&gt;');
-        let tempText = {};
-        //有颜色
-        if (startIndex === 0 &amp;&amp; endIndex &gt; -1) {
-            tempText = {
-                text: text.substring(startIndex + 3, endIndex),
-                color
-            };
-            text = text.substring(endIndex + 4);
-        } else {
-            if (startIndex &gt; -1) {
-                tempText = {
-                    text: text.substring(0, startIndex), //取文本到&lt;b&gt;截止
-                    color: ''
-                }
-                text = text.substring(startIndex);//剩余文本
-            } else {
-                tempText = {
-                    text: text.substring(0),
-                    color: ''
-                }
-                text = '';
-            }
-        }
-        if(tempText.text.includes('\\n')) {  //有换行
-            let arr = tempText.text.split('\\n');
-            arr.forEach((item,index) =&gt; {
-                textArr.push({
-                    text: item,
-                    color: tempText.color,
-                    newline : index&gt;0 //第二个文本才换行
-                });
-            });
-    
-        }else {
-            textArr.push(tempText);
-        }
-    }
-    return textArr;
-    },
+	let textArr = [];
+	if(text &amp;&amp; text.length) {
+		while (text.length) {
+			let startIndex = text.indexOf('&lt;b&gt;');
+			let endIndex = text.indexOf('&lt;/b&gt;');
+			let tempText = {};
+			// 有颜色
+			if (startIndex === 0 ) {
+				if(endIndex &gt; -1) {
+					tempText = {
+						text: text.substring(startIndex + 3, endIndex),
+						color
+					};
+					text = text.substring(endIndex + 4);
+				}else{//只有&lt;b&gt;没有结束标签的情况
+					tempText = {
+						text: text.substring(0),
+						color: ''
+					}
+					text = '';
+				}
+
+			} else {
+				if (startIndex &gt; -1) {
+					tempText = {
+						text: text.substring(0, startIndex), // 取文本到&lt;b&gt;截止
+						color: ''
+					}
+					text = text.substring(startIndex);// 剩余文本
+				} else {
+					tempText = {
+						text: text.substring(0),
+						color: ''
+					}
+					text = '';
+				}
+			}
+			if (tempText.text.includes('\\n')) { // 有换行
+				let arr = tempText.text.split('\\n');
+				arr.forEach((item, index) =&gt; {
+					textArr.push({
+						text: item,
+						color: tempText.color,
+						newline: index &gt; 0 // 第二个文本才换行
+					});
+				});
+			} else {
+				textArr.push(tempText);
+			}
+		}
+	}
+
+	return textArr;
+}
+</code></pre>
+
+<p>wxml渲染</p>
+
+<pre><code>&lt;block wx:for=&quot;{{tinyRule.text}}&quot;&gt;
+	 &lt;view wx:if=&quot;{{item.newline}}&quot;&gt;&lt;/view&gt;
+	 &lt;text style=&quot;color:{{item.color}}&quot; &gt;{{item.text}}&lt;/text&gt;
+&lt;/block&gt;
+
 </code></pre>
 </div>
         <div class="post_footer">
