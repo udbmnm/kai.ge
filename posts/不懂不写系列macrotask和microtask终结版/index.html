@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-cn" >
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  
+  <meta name="author"
+        content="凯哥"/>
+
+  
+  <meta name="description" content="经常看到下面这样的一个例子： console.log(&#39;script start&#39;); setTimeout(function() { console.log(&#39;setTimeout&#39;); }, 0); Promise.resolve().then(function() { console.log(&#39;promise1&#39;); }).then(function() { console.log(&#39;promise2&#39;); }); console.log(&#39;script end&#39;); 如果你不能立马得出答案，或则模棱两可的猜测执行过程，那你肯定没有理解清楚JS的事件循环机制，也就是常常听到的Event Loop。其实理解清楚"/>
+  
+
+  
+  
+  <meta name="keywords" content="kai.ge, blog, hugo"/>
+  
+
+  
+  <link rel="canonical" href="https://kai.ge/posts/%E4%B8%8D%E6%87%82%E4%B8%8D%E5%86%99%E7%B3%BB%E5%88%97macrotask%E5%92%8Cmicrotask%E7%BB%88%E7%BB%93%E7%89%88/"/>
+
+  
+
+  <title>不懂不写系列：EventLoop事件循环macrotask和microtask终结篇 &middot; 凯哥的个人网站</title>
+
+  <link rel="shortcut icon" href="https://kai.ge/images/favicon.ico"/>
+  <link rel="stylesheet" href="https://kai.ge/css/animate.min.css"/>
+  <link rel="stylesheet" href="https://kai.ge/css/remixicon.css"/>
+  <link rel="stylesheet" href="https://kai.ge/css/zozo.css"/>
+  <link rel="stylesheet" href="https://kai.ge/css/highlight.css"/>
+
+  
+  
+</head>
+
+<body>
+<div class="main animated">
+  <div class="nav_container animated fadeInDown">
+  <div class="site_nav" id="site_nav">
+    <ul>
+      
+      <li>
+        <a href="/">首页</a>
+      </li>
+      
+      <li>
+        <a href="/posts/">归档</a>
+      </li>
+      
+      <li>
+        <a href="/tags/">标签</a>
+      </li>
+      
+      <li>
+        <a href="/about/">关于</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="menu_icon">
+    <a id="menu_icon"><i class="remixicon-links-line"></i></a>
+  </div>
+</div>
+
+  <div class="header animated fadeInDown">
+  <div class="site_title_container">
+    <div class="site_title">
+      <h1>
+        <a href="https://kai.ge">
+          <span>凯哥的个人网站</span>
+          <img src="https://kai.ge/images/logo.svg"/>
+        </a>
+      </h1>
+    </div>
+    <div class="description">
+      <p class="sub_title">kai.ge</p>
+      <div class="my_socials">
+        
+        
+        <a href="https://dev.tencent.com/u/f2e" title="github" target="_blank"><i class="remixicon-github-fill"></i></a>
+        
+        
+        
+        <a href="https://twitter.com/udbmnm" title="twitter" target="_blank"><i class="remixicon-twitter-fill"></i></a>
+        
+        
+        <a href="https://kai.ge/index.xml" type="application/rss+xml" title="rss" target="_blank"><i class="remixicon-rss-fill"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="post_page">
+      <div class="post animated fadeInDown">
+        <div class="post_title post_detail_title">
+          <h2><a href='/posts/%E4%B8%8D%E6%87%82%E4%B8%8D%E5%86%99%E7%B3%BB%E5%88%97macrotask%E5%92%8Cmicrotask%E7%BB%88%E7%BB%93%E7%89%88/'>不懂不写系列：EventLoop事件循环macrotask和microtask终结篇</a></h2>
+          <span class="date">2019.08.22</span>
+        </div>
+        <div class="post_content markdown">
+
+<p>经常看到下面这样的一个例子：</p>
+
+<pre><code>console.log('script start');
+
+setTimeout(function() {
+  console.log('setTimeout');
+}, 0);
+
+Promise.resolve().then(function() {
+  console.log('promise1');
+}).then(function() {
+  console.log('promise2');
+});
+
+console.log('script end');
+</code></pre>
+
+<p>如果你不能立马得出答案，或则模棱两可的猜测执行过程，那你肯定没有理解清楚JS的事件循环机制，也就是常常听到的Event Loop。其实理解清楚原理后，像上面这些看起来变态的问题就小菜一碟了，并且是弄懂一次就永不出错，下面开始macrotask和microtask终结篇。</p>
+
+<p>先看下面一张图，你想到了什么，多看几秒钟先自己猜测下......</p>
+
+<p><img src="https://cdn.steemitimages.com/DQmUyZ7SruH55V1TunUpaCLXqG4iYaat7WEoSdBpoLUYa5o/event-loop.jpg" alt="event-loop.jpg" /></p>
+
+<p>几秒钟过后......</p>
+
+<p>好了，我们都知道JavaScript是单线程执行的，即同一时间只能执行一个任务，代码执行是同步并且阻塞的。只有同步执行任务肯定是有问题的，你可以想想这种情况下一个网页加载完是多么卡顿。</p>
+
+<p><img src="https://cdn.steemitimages.com/DQmZi7BW4ughjDezLyNmLEEXDXybUG63Fc2vcN9gw4ThHqs/image.png" alt="" /></p>
+
+<p>所以JS需要能够异步执行任务才能保证浏览器的流畅工作，event loop就是用来协调处理任务队列的。一个浏览器环境（unit of related similar-origin browsing contexts.）只能有一个事件循环（Event loop），而一个事件循环可以多个任务队列（Task queue）</p>
+
+<h1 id="event-loops-https-html-spec-whatwg-org-multipage-webappapis-html-event-loops"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loops">Event loops</a></h1>
+
+<blockquote>
+<p>To coordinate events, user interaction, scripts, rendering, networking, and so forth, user  <a href="https://tc39.es/ecma262/#sec-agents">agents</a> must use event loops as described in this section. Each agent has an associated event loop.
+为了协调事件，用户交互，脚本，渲染，网络等，用户代理必须使用本节所述的event loop.每个代理都有一个关联的事件循环。
+An event loop has one or more task queues. A task queue is a set of tasks.
+一个事件循环具有一个或多个任务队列。任务队列是一组任务。
+Per its source field, each task is defined as coming from a specific task source. For each event loop, every task source must be associated with a specific task queue.
+每个 任务 都定义为来自特定的 任务源。 来自特定 任务源 和指向特定的 事件循环 的的所有任务（例如，由一个 Document 的定时器生成的回调、Document 上鼠标移动触发的事件、 为 Document 的解析器入队的任务）必须总是被添加到同一个 任务队列， 但来自不同 任务源 的 任务 可以放在不同的 任务队列 中。</p>
+</blockquote>
+
+<p>任务队列中的任务可以分为两种，task和microtask，<strong>通常我们把task叫做macrotask</strong>，也就是宏任务，microtask叫做微任务。</p>
+
+<h1 id="任务源-generic-task-sources-https-html-spec-whatwg-org-multipage-webappapis-html-generic-task-sources"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#generic-task-sources">任务源 Generic task sources</a></h1>
+
+<blockquote>
+<ul>
+<li><p><strong>DOM操作任务源：</strong>
+此任务源被用来相应dom操作，例如一个元素以非阻塞的方式插入文档。</p></li>
+
+<li><p><strong>用户交互任务源：</strong>
+此任务源用于对用户交互作出反应，例如键盘或鼠标输入。响应用户操作的事件（例如click）必须使用task队列。</p></li>
+
+<li><p><strong>网络任务源：</strong>
+网络任务源被用来响应网络活动。</p></li>
+
+<li><p><strong>history traversal任务源：</strong>
+当调用history.back()等类似的api时，将任务插进task队列。
+根据其源字段，每个任务被定义为来自特定任务源。对于每个事件循环，每个任务源都必须与特定任务队列相关联。</p></li>
+</ul>
+</blockquote>
+
+<p>task任务源种类非常多，比如ajax的onload，click事件，基本上我们经常绑定的各种dom事件都是task任务源，还有数据库操作（IndexedDB ），需要注意的是setTimeout、setInterval、setImmediate也是task任务源。总结来说task任务源：</p>
+
+<ul>
+<li>setTimeout</li>
+<li>setInterval</li>
+<li>setImmediate</li>
+<li>I/O</li>
+<li>UI rendering</li>
+</ul>
+
+<h1 id="macrotask">macrotask</h1>
+
+<p>包含执行整体的js代码，事件回调，XHR回调，定时器（setTimeout/setInterval/setImmediate），IO操作，UI render</p>
+
+<h1 id="microtask">microtask</h1>
+
+<p>更新应用程序状态的任务，包括promise回调，MutationObserver，process.nextTick，Object.observe</p>
+
+<p><img src="https://cdn.steemitimages.com/DQmWmZxQbUkx4w5u7jiydS5yGCxpYmf79Aj4JMcghnu7nHN/browser-deom1-excute-animate.gif" alt="browser-deom1-excute-animate.gif" /></p>
+
+<pre><code>	console.log('script start');
+
+	setTimeout(function() {
+	  console.log('setTimeout');
+	  Promise.resolve().then(function() {
+		console.log('promise3');
+	  }).then(function() {
+		console.log('promise4');
+	  });
+	}, 0);
+	setTimeout(function() {
+	  Promise.resolve().then(function() {
+		console.log('promise5');
+	  }).then(function() {
+		console.log('promise6');
+	  });
+	}, 0);
+	Promise.resolve().then(function() {
+	  console.log('promise1');
+	}).then(function() {
+	  console.log('promise2');
+	});
+
+	console.log('script end');
+</code></pre>
+
+<p>macrotask：包含执行整体的js代码，事件回调，XHR回调，定时器（setTimeout/setInterval/setImmediate），IO操作，UI render</p>
+
+<p>microtask：更新应用程序状态的任务，包括promise回调，MutationObserver，process.nextTick，Object.observe</p>
+
+<h1 id="需要研究的内容太多-未完待续">需要研究的内容太多，未完待续。。。</h1>
+
+<h1 id="未完待续-坚持不懂不写">未完待续，坚持不懂不写。。</h1>
+
+<p>参考资料：</p>
+
+<hr />
+
+<ul>
+<li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop">WHATWG官方event-loop规范</a></li>
+<li><a href="https://tc39.es/ecma262/#sec-agents">ECMA262中Agent的定义</a></li>
+<li><a href="http://www.xiaojichao.com/post/jscorev2.html#toc-fc9/">JavaScript：核心 - 第二版&lt;翻译&gt;</a></li>
+<li><a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/">tasks-microtasks-queues-and-schedules</a></li>
+<li><a href="https://www.zcfy.cc/article/tasks-microtasks-queues-and-schedules">任务、微任务、队列和时间表&lt;翻译&gt;</a></li>
+<li><a href="https://github.com/aooy/blog/issues/5">从event loop规范探究javaScript异步及浏览器更新渲染时机</a></li>
+<li><a href="https://savokiss.com/tech/learning-microtask-and-macrotask.html">浅析 JS 事件循环之 Microtask 和 Macrotask</a></li>
+<li><a href="https://savokiss.com/tech/event-loop.html">浅析 JS 中的 EventLoop 事件循环（新手向）</a></li>
+<li><a href="http://www.kenote.me/notes/notedetail.html?fileId=388">JS:macrotask和microtask</a></li>
+<li><a href="https://juejin.im/post/59e85eebf265da430d571f89">这一次，彻底弄懂 JavaScript 执行机制</a></li>
+<li><a href="http://lynnelv.github.io/js-event-loop-browser">深入理解js事件循环机制（浏览器篇）</a></li>
+<li><a href="https://whatwg-cn.github.io/html/multipage/webappapis.html#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF">event-loop规范翻译</a></li>
+<li><a href="https://github.com/JChehe/blog/blob/master/posts/%E5%85%B3%E4%BA%8EJavaScript%E5%8D%95%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BA%8B.md">关于JavaScript单线程的一些事</a></li>
+</ul>
+</div>
+        <div class="post_footer">
+          
+        </div>
+      </div>
+      
+      
+    </div>
+  </div>
+  <a id="back_to_top" href="#" class="back_to_top"><span>△</span></a>
+</div>
+<footer class="footer">
+	<div class="powered_by">
+		<a href="http://www.gohugo.io/">Proudly published with Hugo</a>
+	</div>
+
+
+</footer>
+
+<script src="https://kai.ge/js/jquery-3.3.1.min.js"></script>
+<script src="https://kai.ge/js/zozo.js"></script>
+<script src="https://kai.ge/js/highlight.pack.js"></script>
+<link  href="https://kai.ge/css/fancybox.min.css" rel="stylesheet">
+<script src="https://kai.ge/js/fancybox.min.js"></script>
+
+<script>hljs.initHighlightingOnLoad()</script>
+
+
+  <script type="text/javascript" async src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+
+
+
+
+
+
+</body>
+</html>

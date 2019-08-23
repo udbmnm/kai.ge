@@ -111,30 +111,22 @@ microtask：更新应用程序状态的任务，包括promise回调，MutationOb
 
 
 
+# 需要研究的内容太多，未完待续。。。
+# 未完待续，坚持不懂不写。。
 
+参考资料：
 
-
+---
 * [WHATWG官方event-loop规范](https://html.spec.whatwg.org/multipage/webappapis.html#event-loop)
-
 * [ECMA262中Agent的定义](https://tc39.es/ecma262/#sec-agents)
-
 * [JavaScript：核心 - 第二版<翻译>](http://www.xiaojichao.com/post/jscorev2.html#toc-fc9/)
-
 * [tasks-microtasks-queues-and-schedules](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)
-
 * [任务、微任务、队列和时间表<翻译>](https://www.zcfy.cc/article/tasks-microtasks-queues-and-schedules)
-
-[](https://github.com/aooy/blog/issues/5)
-
-[](https://savokiss.com/tech/learning-microtask-and-macrotask.html)
-
-[](https://savokiss.com/tech/event-loop.html)
-
-[](http://www.kenote.me/notes/notedetail.html?fileId=388)
-
-[](https://juejin.im/post/59e85eebf265da430d571f89)
-
-
-[](http://lynnelv.github.io/js-event-loop-browser)
-
-[](https://whatwg-cn.github.io/html/#event-loop)
+* [从event loop规范探究javaScript异步及浏览器更新渲染时机](https://github.com/aooy/blog/issues/5)
+* [浅析 JS 事件循环之 Microtask 和 Macrotask](https://savokiss.com/tech/learning-microtask-and-macrotask.html)
+* [浅析 JS 中的 EventLoop 事件循环（新手向）](https://savokiss.com/tech/event-loop.html)
+* [JS:macrotask和microtask](http://www.kenote.me/notes/notedetail.html?fileId=388)
+* [这一次，彻底弄懂 JavaScript 执行机制](https://juejin.im/post/59e85eebf265da430d571f89)
+* [深入理解js事件循环机制（浏览器篇）](http://lynnelv.github.io/js-event-loop-browser)
+* [event-loop规范翻译](https://whatwg-cn.github.io/html/multipage/webappapis.html#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF)
+* [关于JavaScript单线程的一些事](https://github.com/JChehe/blog/blob/master/posts/%E5%85%B3%E4%BA%8EJavaScript%E5%8D%95%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BA%8B.md)

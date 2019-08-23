@@ -4,18 +4,23 @@
   
   <url>
     <loc>https://kai.ge/posts/</loc>
-    <lastmod>2019-08-16T16:20:22+08:00</lastmod>
+    <lastmod>2019-08-22T20:19:23+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/posts/%E4%B8%8D%E6%87%82%E4%B8%8D%E5%86%99%E7%B3%BB%E5%88%97macrotask%E5%92%8Cmicrotask%E7%BB%88%E7%BB%93%E7%89%88/</loc>
+    <lastmod>2019-08-22T20:19:23+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/</loc>
+    <lastmod>2019-08-22T20:19:23+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://kai.ge/tags/</loc>
-    <lastmod>2019-08-16T16:20:22+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://kai.ge/</loc>
     <lastmod>2019-08-16T16:20:22+08:00</lastmod>
     <priority>0</priority>
   </url>
