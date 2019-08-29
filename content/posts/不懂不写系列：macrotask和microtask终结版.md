@@ -185,7 +185,47 @@ task任务源种类非常多，比如ajax的onload，click事件，基本上我�
 	console.log('script end');
 ```
 
+用JS来实现
 
+```
+class JsEngine {
+    ...
+    // 与event-loop中的初始化对应
+    constructor(tasks) {
+        this.jsStack = tasks;
+        this.runScript(this.runScriptHandler);
+    }
+    runScript(task) {
+    	this.macroTaskQueue.push(task);
+    }
+	runScriptHandler = () => {
+        let curTask = this.jsStack.shift();
+        while (curTask) {
+          	this.runTask(curTask);
+          	curTask = this.jsStack.shift();
+        }
+    }
+    runMacroTask() {
+        const { microTaskQueue, macroTaskQueue } = this;
+		// 根据上述规律，定义macroTaskQueue与microTaskQueue执行的先后顺序
+        macroTaskQueue.forEach(macrotask => {
+        	macrotask();
+          	if (microTaskQueue.length) {
+            	let curMicroTask = microTaskQueue.pop();
+            	while (curMicroTask) {
+              		this.runTask(microTaskQueue);
+             		curMicroTask = microTaskQueue.pop();
+            	}
+        	}
+        });
+    }
+	// 运行task
+    runTask(task) {
+    	new Function(task)();
+    }
+}
+
+```
 
 # 最后来个小菜🍖
 
@@ -260,3 +300,4 @@ button.addEventListener('click', function CB1() {
 * [JavaScript 运行机制详解：再谈Event Loop](http://www.ruanyifeng.com/blog/2014/10/event-loop.html)
 * [event-loop规范翻译](https://whatwg-cn.github.io/html/multipage/webappapis.html#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF)
 * [关于JavaScript单线程的一些事](https://github.com/JChehe/blog/blob/master/posts/%E5%85%B3%E4%BA%8EJavaScript%E5%8D%95%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BA%8B.md)
+* [深入浏览器的事件循环 (GDD@2018)](https://zhuanlan.zhihu.com/p/45111890)
