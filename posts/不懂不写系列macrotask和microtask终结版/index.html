@@ -10,7 +10,7 @@
         content="凯哥"/>
 
   
-  <meta name="description" content="经常看到下面这样的一个例子： console.log(&#39;script start&#39;); setTimeout(function() { console.log(&#39;setTimeout&#39;); }, 0); Promise.resolve().then(function() { console.log(&#39;promise1&#39;); }).then(function() { console.log(&#39;promise2&#39;); }); console.log(&#39;script end&#39;); 如果你不能立马得出答案，或则模棱两可的猜测执行过程，那你肯定没有理解清楚JS的事件循环机制，也就是常常听到的Event Loop。其实理解清楚"/>
+  <meta name="description" content="经常看到下面这样的一个例子： console.log(&#39;script start&#39;); setTimeout(function() { console.log(&#39;setTimeout&#39;); }, 0); Promise.resolve().then(function() { console.log(&#39;promise1&#39;); }).then(function() { console.log(&#39;promise2&#39;); }); console.log(&#39;script end&#39;); 如果你能立马得出答案，感觉就是小菜一碟，那么你可以跳过本文了。。。😄 如果你模棱两可的猜测执行过程，那你肯定没有理解清楚JavaScript的"/>
   
 
   
@@ -23,7 +23,7 @@
 
   
 
-  <title>不懂不写系列：EventLoop事件循环macrotask和microtask终结篇 &middot; 凯哥的个人网站</title>
+  <title>不懂不写系列：JavaScript的异步机制，EventLoop，macrotask，microtask，nextTick终结篇 &middot; 凯哥的个人网站</title>
 
   <link rel="shortcut icon" href="https://kai.ge/images/favicon.ico"/>
   <link rel="stylesheet" href="https://kai.ge/css/animate.min.css"/>
@@ -79,7 +79,7 @@
       <div class="my_socials">
         
         
-        <a href="https://dev.tencent.com/u/f2e" title="github" target="_blank"><i class="remixicon-github-fill"></i></a>
+        <a href="https://github.com/udbmnm" title="github" target="_blank"><i class="remixicon-github-fill"></i></a>
         
         
         
@@ -96,7 +96,7 @@
     <div class="post_page">
       <div class="post animated fadeInDown">
         <div class="post_title post_detail_title">
-          <h2><a href='/posts/%E4%B8%8D%E6%87%82%E4%B8%8D%E5%86%99%E7%B3%BB%E5%88%97macrotask%E5%92%8Cmicrotask%E7%BB%88%E7%BB%93%E7%89%88/'>不懂不写系列：EventLoop事件循环macrotask和microtask终结篇</a></h2>
+          <h2><a href='/posts/%E4%B8%8D%E6%87%82%E4%B8%8D%E5%86%99%E7%B3%BB%E5%88%97macrotask%E5%92%8Cmicrotask%E7%BB%88%E7%BB%93%E7%89%88/'>不懂不写系列：JavaScript的异步机制，EventLoop，macrotask，microtask，nextTick终结篇</a></h2>
           <span class="date">2019.08.22</span>
         </div>
         <div class="post_content markdown">
@@ -118,13 +118,15 @@ Promise.resolve().then(function() {
 console.log('script end');
 </code></pre>
 
-<p>如果你不能立马得出答案，或则模棱两可的猜测执行过程，那你肯定没有理解清楚JS的事件循环机制，也就是常常听到的Event Loop。其实理解清楚原理后，像上面这些看起来变态的问题就小菜一碟了，并且是弄懂一次就永不出错。</p>
+<p>如果你能立马得出答案，感觉就是小菜一碟，那么你可以跳过本文了。。。😄</p>
 
-<h2 id="下面开始macrotask和microtask终结篇">下面开始macrotask和microtask终结篇</h2>
+<p>如果你模棱两可的猜测执行过程，那你肯定没有理解清楚JavaScript的异步机制，本文就是为你准备的。我们经常会听到说JavaScript是单线程无阻塞的，单线程怎么能做到无阻塞呢？有的人可能会说因为JavaScript支持异步回调，但是为什么JavaScript支持异步呢？其实理解清楚异步背后的事件循环机制，也就是Event Loop，像上面这些问题和文章开头看起来变态的例子就很容易理解了，并且可以弄懂一次就永不出错。</p>
+
+<h2 id="下面开始event-loop终结之旅">下面开始Event Loop终结之旅</h2>
 
 <hr />
 
-<p>先看下面一张图，多看几秒钟先自己想象下执行过程...</p>
+<p>先看下面一张图，花几秒钟时间先自己想象Event Loop的执行过程...</p>
 
 <p><img src="https://cdn.steemitimages.com/DQmUyZ7SruH55V1TunUpaCLXqG4iYaat7WEoSdBpoLUYa5o/event-loop.jpg" alt="event-loop.jpg" /></p>
 
@@ -137,35 +139,28 @@ console.log('script end');
 <p>因为事关JavaScript的执行过程，所以还会牵扯出一些其它的基础概念：</p>
 
 <ul>
-<li>JavaScript是单线程的，浏览器并不是单线程的</li>
+<li>进程和线程</li>
+<li>栈和队列</li>
 <li>函数调用栈/执行栈</li>
-<li>Stack栈是一种先进后出（FILO）的数据结构</li>
-<li>Queue队列是一种先进先出（LILO）的数据结构</li>
-<li>Synchronous是JavaScript中的同步任务</li>
-<li>Asynchronous是JavaScript中的异步任务</li>
 </ul>
 
 <p>概念很多，一个个击破...</p>
 
-<h1 id="浏览器不是单线程的">浏览器不是单线程的</h1>
+<h1 id="进程和线程">进程和线程</h1>
 
-<p>浏览器是是多进程的，每个进程包含多个线程，比如GUI渲染线程，JS引擎线程，定时器线程，HTTP异步请求线程等。说JavaScript是单线程的一般是指js内核引擎，比如v8引擎。</p>
+<p>浏览器是是多进程的，每打开一个新的tab或者新窗口都相当于创建了一个新的进程，每个进程都有占有独立的cpu和内存资源，多个进程间互不影响，所以一个页面挂了不会影响其它页面。每个进程包含多个线程，比如GUI渲染线程，JS引擎线程，定时器线程，HTTP异步请求线程,事件触发线程等。经常说的JavaScript是单线程的一般是指js内核引擎线程，比如v8引擎。<strong>进程是系统分配资源的最小单位,线程是CPU调度的最小单位。</strong>另外除了进程和线程外，还有一种微线程，一般被成为协程,一个线程可以包含多个协程，协程是用户自己调度的，没有上下文切换消耗,使用协程比较有代表性的就是Golang。</p>
 
 <h1 id="stack-栈-和-queue-队列">Stack（栈）和 Queue（队列）</h1>
 
 <p>Stack和Queue都是两种基本的数据结构，而常用的数据结构有八种，还有六种数据结构分别是：数组（Array）、散列表（Hash）、树（Tree）、链表（Linked List）、堆（Heap）、图（Graph）。</p>
 
-<h2 id="stack">Stack</h2>
+<p><strong><code>Stack：</code></strong>Stack是一种FILO（First In, First Out）的数据结构，也就是<code>先进后出</code>。eg：就像羽毛球筒一样，最先放进去最后才能拿出来</p>
 
-<p>Stack是一种FILO（First In, First Out）的数据结构，也就是<code>先进后出</code>。eg：就像羽毛球筒一样，最先放进去最后才能拿出来</p>
-
-<h2 id="queue">Queue</h2>
-
-<p>队列是一种 FIFO (First In, First Out) 的数据结构，它的特点就是<code>先进先出</code>。eg：去食堂排队吃饭，去的早的排前面的先吃</p>
+<p><strong><code>Queue：</code></strong>队列是一种 FIFO (First In, First Out) 的数据结构，它的特点就是<code>先进先出</code>。eg：去食堂排队吃饭，去的早的排前面的先吃</p>
 
 <h1 id="call-stack-函数调用栈">Call Stack(函数调用栈)</h1>
 
-<p>调用栈，也叫执行栈，既然是栈，也是<code>先进后出</code>的，调用栈用于存储在代码执行期间创建的所有<code>执行上下文</code>。首次运行JS代码时，会创建一个全局执行上下文并Push到当前的执行栈中。每当发生函数调用，引擎都会为该函数创建一个新的函数执行上下文并Push到当前执行栈的栈顶。当栈顶函数运行完成后，其对应的函数执行上下文将会从执行栈中Pop出，上下文控制权将移到当前执行栈的下一个执行上下文。（关于执行上下文后面单独拎出来再写）</p>
+<p>调用栈，也叫执行栈，既然是栈，也是<code>先进后出</code>的，调用栈用于存储代码在执行期间创建的所有<code>执行上下文</code>。首次运行JS代码时，会创建一个全局执行上下文并Push到当前的调用栈中。每当发生函数调用，引擎都会为该函数创建一个新的函数执行上下文并Push到当前调用栈的栈顶。当栈顶函数运行完成后，其对应的函数执行上下文将会从调用栈中Pop出，上下文控制权将移到当前执行栈的下一个执行上下文。（关于执行上下文下次单独拎出来写）</p>
 
 <p>看下面一个例子：</p>
 
@@ -195,37 +190,54 @@ foo();
 <p>下面是copy过来的图：
 <img src="https://cdn.steemitimages.com/DQmStyEA5rYjaWeGLRbpxuMAs6uY21nLS2n4xwbb2fEsKAY/image.png" alt="" /></p>
 
-<h1 id="事件循环-https-developer-mozilla-org-zh-cn-docs-web-javascript-eventloop-e4-ba-8b-e4-bb-b6-e5-be-aa-e7-8e-af"><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/EventLoop#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF">事件循环：</a></h1>
+<p>回顾完上面的基础概念后，下面开始本文的重点概念。</p>
 
-<p>JavaScript引擎遇到一个异步事件后并不会一直等待其返回结果，而是会将这个事件挂起，继续执行执行栈中的其他任务。当一个异步事件返回结果后，js会将这个事件加入与当前执行栈不同的另一个队列，我们称之为事件队列。被放入事件队列不会立刻执行其回调，而是等待当前执行栈中的所有任务都执行完毕， 主线程处于闲置状态时，主线程会去查找事件队列是否有任务。如果有，那么主线程会从中取出排在第一位的事件，并把这个事件对应的回调放入执行栈中，然后执行其中的同步代码...，如此反复，这样就形成了一个无限的循环。这就是这个过程被称为“事件循环（Event Loop）”的原因。</p>
+<h1 id="event-loop-https-html-spec-whatwg-org-multipage-webappapis-html-event-loop"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop">Event Loop：</a></h1>
 
-<p><code>也就是说JavaScript引擎通过事件循环来处理异步任务，遇到异步任务并不会直接放到主线程的执行栈来执行，而是交给其它线程来处理，比如HTTP异步请求线程,定时器线程</code>
-<code>事件循环只能算JS实现异步的一种方式，其它编程语言还有很多不同的实现方式</code></p>
+<h3 id="先看whatag关于-事件循环-的定义">先看WHATAG关于“事件循环”的定义：</h3>
 
 <blockquote>
-<p>之所以称之为事件循环，是因为它经常按照类似如下的方式来被实现：</p>
+<p>To coordinate events, user interaction, scripts, rendering, networking, and so forth, <a href="https://tc39.es/ecma262/#sec-agents">user agents</a> must use event loops as described in this section. Each agent has an associated event loop.</p>
+</blockquote>
+
+<p>翻译过来就是，为了协调事件、用户交互、脚本、渲染、网络等，<code>用户代理</code>必须使用这一小节描述的<code>事件循环</code>。每个<code>代理</code>都有一个关联的事件循环。</p>
+
+<p>其中<a href="https://tc39.es/ecma262/#sec-agents">user agents</a>在ecma262中定义，感兴趣的可以点击上面链接查看详情。这里可以简单理解为一个包含执行上下文堆栈，一组作业队列，执行线程等这些东西的概念。</p>
+
+<h3 id="再看mdn中-事件循环-的定义">再看MDN中“事件循环“的定义：</h3>
+
+<p>MDN里面写到之所以称之为事件循环，是因为它经常按照类似如下的方式来被实现：</p>
 
 <pre><code>  while (queue.waitForMessage()) {
     queue.processNextMessage();
   }
   
 </code></pre>
-</blockquote>
 
-<p>看到没！死循环！浏览器就是这么傻傻的，有任务就干，没事就一直等，就像在守株待兔。。。</p>
+<p>并且还有&quot;执行至完成&quot;的特点：</p>
+
+<blockquote>
+<p>每一个消息完整地执行后，其它消息才会被执行。这为程序的分析提供了一些优秀的特性，包括：一个函数执行时，它永远不会被抢占，并且在其他代码运行之前完全运行（且可以修改此函数操作的数据）。这与C语言不同，例如，如果函数在线程中运行，它可能在任何位置被终止，然后在另一个线程中运行其他代码。这个模型的一个缺点在于当一个消息需要太长时间才能处理完毕时，Web应用就无法处理用户的交互，例如点击或滚动。浏览器用“程序需要过长时间运行”的对话框来缓解这个问题。一个很好的做法是缩短消息处理，并在可能的情况下将一个消息裁剪成多个消息。</p>
+</blockquote>
 
 <p><img src="https://cdn.steemitimages.com/DQmZi7BW4ughjDezLyNmLEEXDXybUG63Fc2vcN9gw4ThHqs/image.png" alt="" /></p>
 
+<!-- 
+JavaScript引擎遇到一个异步事件后并不会一直等待其返回结果，而是会将这个事件挂起，继续执行执行栈中的其他任务。当一个异步事件返回结果后，js会将这个事件加入与当前执行栈不同的另一个队列，我们称之为事件队列。被放入事件队列不会立刻执行其回调，而是等待当前执行栈中的所有任务都执行完毕， 主线程处于闲置状态时，主线程会去查找事件队列是否有任务。如果有，那么主线程会从中取出排在第一位的事件，并把这个事件对应的回调放入执行栈中，然后执行其中的同步代码...，如此反复，这样就形成了一个无限的循环。这就是这个过程被称为“事件循环（Event Loop）”的原因。
+ -->
+
+<!-- `也就是说JavaScript引擎通过事件循环来处理异步任务，遇到异步任务并不会直接放到主线程的执行栈来执行，而是交给其它线程来处理，比如HTTP异步请求线程,定时器线程`
+`事件循环只能算JS实现异步的一种方式，其它编程语言还有很多不同的实现方式`  
+ -->
+
 <blockquote>
-<p>To coordinate events, user interaction, scripts, rendering, networking, and so forth, user  <a href="https://tc39.es/ecma262/#sec-agents">agents</a> must use event loops as described in this section. Each agent has an associated event loop.
-为了协调事件，用户交互，脚本，渲染，网络等，用户代理必须使用本节所述的event loop.每个代理都有一个关联的事件循环。
-An event loop has one or more task queues. A task queue is a set of tasks.
+<p>An event loop has one or more task queues. A task queue is a set of tasks.
 一个事件循环具有一个或多个任务队列。任务队列是一组任务。
 Per its source field, each task is defined as coming from a specific task source. For each event loop, every task source must be associated with a specific task queue.
 每个 任务 都定义为来自特定的 任务源。 来自特定 任务源 和指向特定的 事件循环 的的所有任务（例如，由一个 Document 的定时器生成的回调、Document 上鼠标移动触发的事件、 为 Document 的解析器入队的任务）必须总是被添加到同一个 任务队列， 但来自不同 任务源 的 任务 可以放在不同的 任务队列 中。</p>
 </blockquote>
 
-<h1 id="task分类">Task分类：</h1>
+<h1 id="task定义">Task定义：</h1>
 
 <blockquote>
 <p>所有任务可以分成两种，一种是同步任务（synchronous），另一种是异步任务（asynchronous）。同步任务指的是，在<code>主线程</code>上排队执行的任务，只有前一个任务执行完毕，才能执行后一个任务；异步任务指的是，不进入主线程、而进入<code>&quot;任务队列&quot;</code>（task queue）的任务，只有&quot;任务队列&quot;通知主线程，某个异步任务可以执行了，该任务才会进入主线程执行。</p>
@@ -241,7 +253,6 @@ Per its source field, each task is defined as coming from a specific task source
 
 <h1 id="任务源-generic-task-sources-https-html-spec-whatwg-org-multipage-webappapis-html-generic-task-sources"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#generic-task-sources">任务源 Generic task sources</a></h1>
 
-<blockquote>
 <ul>
 <li><p><strong>DOM操作任务源：</strong>
 此任务源被用来相应dom操作，例如一个元素以非阻塞的方式插入文档。</p></li>
@@ -256,7 +267,6 @@ Per its source field, each task is defined as coming from a specific task source
 当调用history.back()等类似的api时，将任务插进task队列。
 根据其源字段，每个任务被定义为来自特定任务源。对于每个事件循环，每个任务源都必须与特定任务队列相关联。</p></li>
 </ul>
-</blockquote>
 
 <p>task任务源种类非常多，比如ajax的onload，click事件，基本上我们经常绑定的各种dom事件都是task任务源，还有数据库操作（IndexedDB ），需要注意的是setTimeout、setInterval、setImmediate也是task任务源。总结来说task任务源：</p>
 
@@ -302,6 +312,47 @@ Per its source field, each task is defined as coming from a specific task source
 	});
 
 	console.log('script end');
+</code></pre>
+
+<p>用JS来实现</p>
+
+<pre><code>class JsEngine {
+    ...
+    // 与event-loop中的初始化对应
+    constructor(tasks) {
+        this.jsStack = tasks;
+        this.runScript(this.runScriptHandler);
+    }
+    runScript(task) {
+    	this.macroTaskQueue.push(task);
+    }
+	runScriptHandler = () =&gt; {
+        let curTask = this.jsStack.shift();
+        while (curTask) {
+          	this.runTask(curTask);
+          	curTask = this.jsStack.shift();
+        }
+    }
+    runMacroTask() {
+        const { microTaskQueue, macroTaskQueue } = this;
+		// 根据上述规律，定义macroTaskQueue与microTaskQueue执行的先后顺序
+        macroTaskQueue.forEach(macrotask =&gt; {
+        	macrotask();
+          	if (microTaskQueue.length) {
+            	let curMicroTask = microTaskQueue.pop();
+            	while (curMicroTask) {
+              		this.runTask(microTaskQueue);
+             		curMicroTask = microTaskQueue.pop();
+            	}
+        	}
+        });
+    }
+	// 运行task
+    runTask(task) {
+    	new Function(task)();
+    }
+}
+
 </code></pre>
 
 <h1 id="最后来个小菜">最后来个小菜🍖</h1>
@@ -373,6 +424,13 @@ button.addEventListener('click', function CB1() {
 <li><a href="http://www.ruanyifeng.com/blog/2014/10/event-loop.html">JavaScript 运行机制详解：再谈Event Loop</a></li>
 <li><a href="https://whatwg-cn.github.io/html/multipage/webappapis.html#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF">event-loop规范翻译</a></li>
 <li><a href="https://github.com/JChehe/blog/blob/master/posts/%E5%85%B3%E4%BA%8EJavaScript%E5%8D%95%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BA%8B.md">关于JavaScript单线程的一些事</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/45111890">深入浏览器的事件循环 (GDD@2018)</a></li>
+<li><a href="https://gist.github.com/yyx990803/d1a0eaac052654f93a1ccaab072076dd">Reverting nextTick to Always Use Microtask</a></li>
+<li><a href="https://juejin.im/post/5c4041805188252420629086#heading-0">模拟实现 JS 引擎：深入了解 JS机制 以及 Microtask and Macrotask</a></li>
+<li><a href="https://juejin.im/post/5be5a0b96fb9a049d518febc">总结：JavaScript异步、事件循环与消息队列、微任务与宏任务</a></li>
+<li><a href="https://juejin.im/post/5c7a9b92518825153f784e14">JS引擎线程的执行过程的三个阶段</a></li>
+<li><a href="https://juejin.im/post/5cd9854b5188252035420a13">你真的理解$nextTick么</a></li>
+<li><a href="https://juejin.im/post/5a6ad46ef265da3e513352c8">JavaScript异步机制详解</a></li>
 </ul>
 </div>
         <div class="post_footer">
