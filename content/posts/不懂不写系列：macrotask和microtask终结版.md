@@ -24,11 +24,11 @@ console.log('script end');
 
 如果你能立马得出答案，感觉就是小菜一碟，那么你可以跳过本文了。。。😄
 
-如果你模棱两可的猜测执行过程，那你肯定没有理解清楚JavaScript的异步机制，本文就是为你准备的。我们经常会听到说JavaScript是单线程无阻塞的，单线程怎么能做到无阻塞呢？有的人可能会说因为JavaScript支持异步回调，但是为什么JavaScript支持异步呢？其实理解清楚异步背后的事件循环机制，也就是Event Loop，像上面这些问题和文章开头看起来变态的例子就很容易理解了，并且可以弄懂一次就永不出错。
+如果你模棱两可的猜测执行过程，那你肯定没有理解清楚JavaScript的异步机制，本文就是为你准备的。我们经常会听到说JavaScript是单线程无阻塞的，单线程怎么能做到无阻塞呢？有的人可能会说因为JavaScript支持异步回调，但是为什么能支持异步？其实理解清楚异步背后的事件循环机制，也就是Event Loop，像上面这些问题就很容易回答了，并且可以弄懂一次就永不出错。上面的例子就不说答案了，答案不在F12，而在于弄懂Event Loop。
 
 ## 下面开始终结之旅
 ---
-先看下面一张图，花几秒钟时间先自己想象Event Loop的执行过程...
+先看下面这张经常被引用的图，花几秒钟时间先自己想象Event Loop的执行过程...
 
 ![event-loop.jpg](https://cdn.steemitimages.com/DQmUyZ7SruH55V1TunUpaCLXqG4iYaat7WEoSdBpoLUYa5o/event-loop.jpg)
 
@@ -37,7 +37,9 @@ console.log('script end');
 
 好了，可以直观的看出图中包含三个主要的概念：
 
-`Event Loop`，`macrotask`，`microtask`
+`Event Loop`，`macrotask`，`microtask`。
+
+另外还有一个隐藏的重要的概念：`任务队列`。
 
 因为事关JavaScript的执行过程，所以还会牵扯出一些其它的基础概念：
 
@@ -47,16 +49,16 @@ console.log('script end');
 
 概念很多，我们各个击破...
 # 进程和线程
-浏览器是是多进程的，每打开一个新的tab或者新窗口都相当于创建了一个新的进程，每个进程都有占有独立的cpu和内存资源，多个进程间互不影响，所以一个页面挂了不会影响其它页面。每个进程包含多个线程，比如GUI渲染线程，JS引擎线程，定时器线程，HTTP异步请求线程,事件触发线程等。经常说的JavaScript是单线程的一般是指js内核引擎线程，比如v8引擎。**进程是系统分配资源的最小单位,线程是CPU调度的最小单位。**另外除了进程和线程外，还有一种微线程，一般被成为协程,一个线程可以包含多个协程，协程是用户自己调度的，没有上下文切换消耗,使用协程比较有代表性的就是Golang。
+浏览器是是多进程的，每打开一个新的tab或者新窗口都相当于创建了一个新的进程，每个进程都有占有独立的cpu和内存资源，多个进程间互不影响，所以一个页面挂了不会影响其它页面。每个进程包含多个线程，比如GUI渲染线程，JS引擎线程，定时器线程，HTTP异步请求线程,事件触发线程等。经常说的JavaScript是单线程的一般是指js内核引擎线程，比如v8引擎。**进程是系统分配资源的最小单位,线程是CPU调度的最小单位。**另外除了进程和线程外，还有一种微线程，一般被成为协程,一个线程可以包含多个协程，协程是用户自己调度的，没有上下文切换消耗,所以性能非常高，使用协程比较有代表性的就是Golang。
 # Stack（栈）和 Queue（队列）
-Stack和Queue都是两种基本的数据结构，而常用的数据结构有八种，还有六种数据结构分别是：数组（Array）、散列表（Hash）、树（Tree）、链表（Linked List）、堆（Heap）、图（Graph）。
+Stack和Queue是两种基本的数据结构，而常用的数据结构有八种，还有六种数据结构分别是：数组（Array）、散列表（Hash）、树（Tree）、链表（Linked List）、堆（Heap）、图（Graph）。
 
 **`Stack：`**Stack是一种FILO（First In, First Out）的数据结构，也就是`先进后出`。eg：就像羽毛球筒一样，最先放进去最后才能拿出来
 
 **`Queue：`**队列是一种 FIFO (First In, First Out) 的数据结构，它的特点就是`先进先出`。eg：去食堂排队吃饭，去的早的排前面的先吃
 
 # Call Stack(函数调用栈)
-调用栈，也叫执行栈，既然是栈，也是`先进后出`的，调用栈用于存储代码在执行期间创建的所有`执行上下文`。首次运行JS代码时，会创建一个全局执行上下文并Push到当前的调用栈中。每当发生函数调用，引擎都会为该函数创建一个新的函数执行上下文并Push到当前调用栈的栈顶。当栈顶函数运行完成后，其对应的函数执行上下文将会从调用栈中Pop出，上下文控制权将移到当前执行栈的下一个执行上下文。（关于执行上下文下次单独拎出来写）
+函数调用栈，也叫执行栈，既然是栈，也是`先进后出`的，调用栈用于存储代码在执行期间创建的所有`执行上下文`。首次运行JS代码时，会创建一个全局执行上下文并Push到当前的调用栈中。每当发生函数调用，引擎都会为该函数创建一个新的函数执行上下文并Push到当前调用栈的栈顶。当栈顶函数运行完成后，其对应的函数执行上下文将会从调用栈中Pop出，上下文控制权将移到当前执行栈的下一个执行上下文。（关于执行上下文下次单独拎出来写）
 
 看下面一个例子：
 
@@ -81,11 +83,13 @@ foo();
 5. bar执行完毕被弹出，目前栈里面有 [foo]
 6. foo执行完毕被弹出，目前栈为空 []
 
-下面是copy过来的图：
+下面是copy过来的图，看起来更直观：
 ![](https://cdn.steemitimages.com/DQmStyEA5rYjaWeGLRbpxuMAs6uY21nLS2n4xwbb2fEsKAY/image.png)
 
 
-回顾完上面的基础概念后，下面开始本文的重要概念。
+#   
+
+回顾完上面的基础概念后，下面开始本文的主要内容。
 # [Event Loop是什么？](https://html.spec.whatwg.org/multipage/webappapis.html#event-loop)
 
 #### 先看WHATAG的定义：
@@ -93,7 +97,7 @@ foo();
 >To coordinate events, user interaction, scripts, rendering, networking, and so forth, [user agents](https://tc39.es/ecma262/#sec-agents) must use event loops as described in this section. Each agent has an associated event loop.
 >An event loop has one or more task queues. A task queue is a set of tasks.
 
-翻译过来就是，为了协调事件、用户交互、脚本、渲染、网络等，`用户代理`必须使用这一小节描述的`事件循环`。每个`代理`都有一个关联的事件循环。一个事件循环具有一个或多个`任务队列`。任务队列是一组任务。关于任务队列后面会详细说。其中[user agents](https://tc39.es/ecma262/#sec-agents)在ecma262中定义，感兴趣的可以点击上面链接查看详情。这里可以简单理解为一个包含执行上下文堆栈，一组作业队列，执行线程等这些东西的概念。
+翻译过来就是，为了协调事件、用户交互、脚本、渲染、网络等，`用户代理`必须使用这一小节描述的`事件循环`。每个`代理`都有一个关联的事件循环。一个事件循环具有一个或多个`任务队列`。任务队列是一组任务。关于任务队列后面会详细说。其中[用户代理（user agents）](https://tc39.es/ecma262/#sec-agents)在ecma262中定义，感兴趣的可以点击上面链接查看详情。这里可以简单理解为一个包含执行上下文堆栈，一组作业队列，执行线程等这些东西的概念。
 
 ### 再看MDN中“事件循环“的描述：
 
@@ -107,11 +111,12 @@ foo();
 ```
 
 并且还有"`执行至完成`"的特点：
+
 >每一个消息完整地执行后，其它消息才会被执行。这为程序的分析提供了一些优秀的特性，包括：一个函数执行时，它永远不会被抢占，并且在其他代码运行之前完全运行（且可以修改此函数操作的数据）。这与C语言不同，例如，如果函数在线程中运行，它可能在任何位置被终止，然后在另一个线程中运行其他代码。这个模型的一个缺点在于当一个消息需要太长时间才能处理完毕时，Web应用就无法处理用户的交互，例如点击或滚动。浏览器用“程序需要过长时间运行”的对话框来缓解这个问题。一个很好的做法是缩短消息处理，并在可能的情况下将一个消息裁剪成多个消息。
 
 ![](https://cdn.steemitimages.com/DQmZi7BW4ughjDezLyNmLEEXDXybUG63Fc2vcN9gw4ThHqs/image.png)
 
-综合各种规范和来自“民间”的共识，我得出的结论是这样的：
+综合各种“官方”的规范和来自“民间”的共识，我得出的结论是这样的：
 #### `事件循环就是不断读取和执行任务队列中任务的过程。任务队列中的任务可能包含同步任务和异步任务，并且一个任务执行的过程是不能被中断的。`
 
 有没有发现，说了半天其实真正的主角是`任务队列`, 别急😂，说好的各个击破。。。
@@ -128,7 +133,7 @@ foo();
 
 >Each event loop has associated values event loop begin and event loop end, which are initially unset.
 
-规范中写得很详细，这里只引用了部分重要的概念。总结如下：
+又是一大串英文😂，规范中写得很详细，这里只引用了部分重要的概念。概括如下：
 
 * 每个任务来自特定任务源，对于每个事件循环，每个任务源都必须与特定任务队列相关联。
 
@@ -143,23 +148,23 @@ foo();
 
 ⚠️ 任务队列是Sets(集合)，不是队列！！因为事件循环处理模型的第一步是从所选队列中获取第一个可运行任务，而不是使第一个任务出列（dequeue）。Sets在规范中的定义是没有相同item的有序list。这里顺便提一下，[ECMA T39](https://tc39.es/ecma262/#sec-jobs-and-job-queues)规范中把任务叫做job，任务队列叫做 Job Queues。并且提到 "A Job Queue is a FIFO queue of PendingJob records"。也就是说ECMA把任务队列当成先进先出的`Queue`数据结构，WHATWG强调不是`Queue`，很多文章会直接把任务队列直接当作`队列`，这里需要注意下。
 
-⚠️ 任务源主要作用是用于区分逻辑上不同类型的任务
+⚠️ 任务源主要作用是用于区分逻辑上不同类型的任务，因为任务来源非常广泛，比如有的可能是来自点击，有的可能是ajax请求完成。
 
 # [任务源 Generic task sources](https://html.spec.whatwg.org/multipage/webappapis.html#generic-task-sources)
 
-* **DOM操作任务源：**
+* DOM操作任务源：
 此任务源被用来相应dom操作，例如一个元素以非阻塞的方式插入文档。
 
-* **用户交互任务源：**
+* 用户交互任务源：
 此任务源用于对用户交互作出反应，例如键盘或鼠标输入。响应用户操作的事件（例如click）必须使用task队列。
 
-* **网络任务源：**
+* 网络任务源：
 网络任务源被用来响应网络活动。
 
-* **history traversal任务源：**
+* history traversal任务源：
 当调用history.back()等类似的api时，将任务插进task队列。
 
-task任务源种类非常多，比如ajax的onload，鼠标click事件，基本上我们经常绑定的各种dom事件都是task任务源，还有数据库操作（IndexedDB ），需要注意的是setTimeout、setInterval、setImmediate也是task任务源。总结来说task任务源有这几种：
+任务源种类非常多，比如ajax的onload，鼠标click事件，基本上我们经常绑定的各种dom事件都是task任务源，还有数据库操作（IndexedDB ），需要注意的是setTimeout、setInterval、setImmediate也是task任务源。总结来说task任务源有这几种：
 
 * setTimeout
 * setInterval
@@ -171,15 +176,15 @@ task任务源种类非常多，比如ajax的onload，鼠标click事件，基本�
 
 >所有任务可以分成两种，一种是同步任务（synchronous），另一种是异步任务（asynchronous）。同步任务指的是，在`主线程`上排队执行的任务，只有前一个任务执行完毕，才能执行后一个任务；异步任务指的是，不进入主线程、而进入`"任务队列"`（task queue）的任务，只有"任务队列"通知主线程，某个异步任务可以执行了，该任务才会进入主线程执行。
 
-上面一段是来自阮一峰博客，虽然写于2014年，但是这么归类现在看也没错，但是需要修订一下。😄
-#### `任务一般可以分成两种，一种是宏任务（macrotask），另一种是微任务（microtask）。宏任务包含同步任务和异步任务，微任务都是异步任务。`
+上面一段是来自阮一峰博客，文章写于2014年，虽然这么归类现在看也没错，但是需要修订一下😄。
+#### `任务一般可以分成两种，一种是同步任务（synchronous），另一种是异步任务（asynchronous）。异步任务也可以分为两种，一种是宏任务（macrotask），另一种是微任务（microtask）。宏任务包含同步任务和异步任务，微任务都是异步任务。`
 在WHATWG的规范中并没有找到关于macrotask的定义，但是一般大家的共识是把task就当作macrotask，与之相对的是microtask。
 
-⚠️ Node环境和ES6之后才出现微任务的概念
+⚠️ ES6+和Node环境才出现微任务的概念，比如Promise和process.nextTick，之前只需要理解同步任务和异步任务就行了，
 
-# macrotask
+# macrotask来源：
 script主代码，事件回调，XHR回调，定时器（setTimeout/setInterval/setImmediate），IO操作，UI render
-# microtask
+# microtask来源：
 promise回调，MutationObserver，process.nextTick，Object.observe
 
 # 任务执行顺序
@@ -196,7 +201,7 @@ promise回调，MutationObserver，process.nextTick，Object.observe
 5. 重复上述步骤，直到两个任务队列都为空
 
 
-上面是基本任务执行过程，更详细的过程中可能还会包含Web worker，requestAnimationFrame和requestIdleCallback。很多文章把requestAnimationFrame归类为macrotask，但是我并没有找到出处，requestAnimationFrame属于异步任务但是不在任务队列中，我更偏向于认为既不属于macrotask也不属于microtask，有知道出处的朋友欢迎来交流。
+上面是任务队列基本执行过程，更详细的过程中还会包含Web worker，requestAnimationFrame和requestIdleCallback。很多文章把requestAnimationFrame归类为macrotask，但是我并没有找到出处，requestAnimationFrame属于异步任务但是不在任务队列中，我更偏向于认为既不属于macrotask也不属于microtask，有知道出处的朋友欢迎来交流。
 
 
 ## 再来看开篇的问题：
@@ -215,21 +220,147 @@ Promise.resolve().then(function() {
 
 console.log('script end');
 ```
+先文字描述下执行过程：
+
+1. console.log('script start')属于同步代码，进入JS主线程`执行栈`后直接执行，输出结果`script start`。
+2. JS主线程遇到setTimeout，发现是异步代码并且是宏任务，把回调放进macrotask队列等待执行。
+3. JS主线程遇到Promise并且resolve了，将第一个Promise then回调放进microtask队列。
+4. console.log('script end')属于同步代码直接执行，输出结果`script end`。
+5. 此时主线程执行栈为空，开始处理微任务队列，执行console.log('promise1')，输出`script promise1`，并且同时又链式调用then创造了一个微任务进入microtask队列。
+6. 再次主线程执行栈为空，继续第5步，输出`script promise2`，直到microtask队列也为空。
+7. 浏览器视情况而定决定是否刷新渲染ui。
+8. 进入下一个循环，发现macrotask队列有任务，执行 console.log('setTimeout'); 输出`script setTimeout`。
 
 下面是copy过来的一张图，执行过程非常清晰：
-
 ![browser-deom1-excute-animate.gif](https://cdn.steemitimages.com/DQmWmZxQbUkx4w5u7jiydS5yGCxpYmf79Aj4JMcghnu7nHN/browser-deom1-excute-animate.gif)
 
+# 再来看看Vue.$nextTick中的应用
+
+先看Vue.js 2.5.17的实现。
+
+```
+import { noop } from 'shared/util'
+import { handleError } from './error'
+import { isIOS, isNative } from './env'
+
+const callbacks = []
+let pending = false
+
+function flushCallbacks () {
+  pending = false
+  const copies = callbacks.slice(0)
+  callbacks.length = 0
+  for (let i = 0; i < copies.length; i++) {
+    copies[i]()
+  }
+}
+
+// Here we have async deferring wrappers using both microtasks and (macro) tasks.
+// In < 2.4 we used microtasks everywhere, but there are some scenarios where
+// microtasks have too high a priority and fire in between supposedly
+// sequential events (e.g. #4521, #6690) or even between bubbling of the same
+// event (#6566). However, using (macro) tasks everywhere also has subtle problems
+// when state is changed right before repaint (e.g. #6813, out-in transitions).
+// Here we use microtask by default, but expose a way to force (macro) task when
+// needed (e.g. in event handlers attached by v-on).
+let microTimerFunc
+let macroTimerFunc
+let useMacroTask = false
+
+// Determine (macro) task defer implementation.
+// Technically setImmediate should be the ideal choice, but it's only available
+// in IE. The only polyfill that consistently queues the callback after all DOM
+// events triggered in the same loop is by using MessageChannel.
+/* istanbul ignore if */
+if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
+  macroTimerFunc = () => {
+    setImmediate(flushCallbacks)
+  }
+} else if (typeof MessageChannel !== 'undefined' && (
+  isNative(MessageChannel) ||
+  // PhantomJS
+  MessageChannel.toString() === '[object MessageChannelConstructor]'
+)) {
+  const channel = new MessageChannel()
+  const port = channel.port2
+  channel.port1.onmessage = flushCallbacks
+  macroTimerFunc = () => {
+    port.postMessage(1)
+  }
+} else {
+  /* istanbul ignore next */
+  macroTimerFunc = () => {
+    setTimeout(flushCallbacks, 0)
+  }
+}
+
+// Determine microtask defer implementation.
+/* istanbul ignore next, $flow-disable-line */
+if (typeof Promise !== 'undefined' && isNative(Promise)) {
+  const p = Promise.resolve()
+  microTimerFunc = () => {
+    p.then(flushCallbacks)
+    // in problematic UIWebViews, Promise.then doesn't completely break, but
+    // it can get stuck in a weird state where callbacks are pushed into the
+    // microtask queue but the queue isn't being flushed, until the browser
+    // needs to do some other work, e.g. handle a timer. Therefore we can
+    // "force" the microtask queue to be flushed by adding an empty timer.
+    if (isIOS) setTimeout(noop)
+  }
+} else {
+  // fallback to macro
+  microTimerFunc = macroTimerFunc
+}
+
+/**
+ * Wrap a function so that if any code inside triggers state change,
+ * the changes are queued using a (macro) task instead of a microtask.
+ */
+export function withMacroTask (fn: Function): Function {
+  return fn._withTask || (fn._withTask = function () {
+    useMacroTask = true
+    const res = fn.apply(null, arguments)
+    useMacroTask = false
+    return res
+  })
+}
+
+export function nextTick (cb?: Function, ctx?: Object) {
+  let _resolve
+  callbacks.push(() => {
+    if (cb) {
+      try {
+        cb.call(ctx)
+      } catch (e) {
+        handleError(e, ctx, 'nextTick')
+      }
+    } else if (_resolve) {
+      _resolve(ctx)
+    }
+  })
+  if (!pending) {
+    pending = true
+    if (useMacroTask) {
+      macroTimerFunc()
+    } else {
+      microTimerFunc()
+    }
+  }
+  // $flow-disable-line
+  if (!cb && typeof Promise !== 'undefined') {
+    return new Promise(resolve => {
+      _resolve = resolve
+    })
+  }
+}	
+
+```
+
+Vue2.5对于 macrotask 的实现，优先检测是否支持原生setImmediate，这是一个高版本 IE 和 Edge 才支持的特性，不支持的话再去检测是否支持原生的 MessageChannel，如果也不支持的话就会降级为setTimeout 0；而对于 microtask 的实现，则检测浏览器是否原生支持 Promise，不支持的话直接指向 macrotask 的实现。
 
 
-<!-- 
-JavaScript引擎遇到一个异步事件后并不会一直等待其返回结果，而是会将这个事件挂起，继续执行执行栈中的其他任务。当一个异步事件返回结果后，js会将这个事件加入与当前执行栈不同的另一个队列，我们称之为事件队列。被放入事件队列不会立刻执行其回调，而是等待当前执行栈中的所有任务都执行完毕， 主线程处于闲置状态时，主线程会去查找事件队列是否有任务。如果有，那么主线程会从中取出排在第一位的事件，并把这个事件对应的回调放入执行栈中，然后执行其中的同步代码...，如此反复，这样就形成了一个无限的循环。这就是这个过程被称为“事件循环（Event Loop）”的原因。
- -->
-<!-- `也就是说JavaScript引擎通过事件循环来处理异步任务，遇到异步任务并不会直接放到主线程的执行栈来执行，而是交给其它线程来处理，比如HTTP异步请求线程,定时器线程`
-`事件循环只能算JS实现异步的一种方式，其它编程语言还有很多不同的实现方式`  
- -->
 
-# 用JS实现的Event Loop过程
+# 下面是网友用JS实现的Event Loop过程：
 
 ```
 class JsEngine {
