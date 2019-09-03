@@ -122,7 +122,7 @@ console.log('script end');
 
 <p>如果你模棱两可的猜测执行过程，那你肯定没有理解清楚JavaScript的异步机制，本文就是为你准备的。我们经常会听到说JavaScript是单线程无阻塞的，单线程怎么能做到无阻塞呢？有的人可能会说因为JavaScript支持异步回调，但是为什么JavaScript支持异步呢？其实理解清楚异步背后的事件循环机制，也就是Event Loop，像上面这些问题和文章开头看起来变态的例子就很容易理解了，并且可以弄懂一次就永不出错。</p>
 
-<h2 id="下面开始event-loop终结之旅">下面开始Event Loop终结之旅</h2>
+<h2 id="下面开始终结之旅">下面开始终结之旅</h2>
 
 <hr />
 
@@ -144,7 +144,7 @@ console.log('script end');
 <li>函数调用栈/执行栈</li>
 </ul>
 
-<p>概念很多，一个个击破...</p>
+<p>概念很多，我们各个击破...</p>
 
 <h1 id="进程和线程">进程和线程</h1>
 
@@ -190,23 +190,22 @@ foo();
 <p>下面是copy过来的图：
 <img src="https://cdn.steemitimages.com/DQmStyEA5rYjaWeGLRbpxuMAs6uY21nLS2n4xwbb2fEsKAY/image.png" alt="" /></p>
 
-<p>回顾完上面的基础概念后，下面开始本文的重点概念。</p>
+<p>回顾完上面的基础概念后，下面开始本文的重要概念。</p>
 
-<h1 id="event-loop-https-html-spec-whatwg-org-multipage-webappapis-html-event-loop"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop">Event Loop：</a></h1>
+<h1 id="event-loop是什么-https-html-spec-whatwg-org-multipage-webappapis-html-event-loop"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop">Event Loop是什么？</a></h1>
 
-<h3 id="先看whatag关于-事件循环-的定义">先看WHATAG关于“事件循环”的定义：</h3>
+<h4 id="先看whatag的定义">先看WHATAG的定义：</h4>
 
 <blockquote>
-<p>To coordinate events, user interaction, scripts, rendering, networking, and so forth, <a href="https://tc39.es/ecma262/#sec-agents">user agents</a> must use event loops as described in this section. Each agent has an associated event loop.</p>
+<p>To coordinate events, user interaction, scripts, rendering, networking, and so forth, <a href="https://tc39.es/ecma262/#sec-agents">user agents</a> must use event loops as described in this section. Each agent has an associated event loop.
+An event loop has one or more task queues. A task queue is a set of tasks.</p>
 </blockquote>
 
-<p>翻译过来就是，为了协调事件、用户交互、脚本、渲染、网络等，<code>用户代理</code>必须使用这一小节描述的<code>事件循环</code>。每个<code>代理</code>都有一个关联的事件循环。</p>
+<p>翻译过来就是，为了协调事件、用户交互、脚本、渲染、网络等，<code>用户代理</code>必须使用这一小节描述的<code>事件循环</code>。每个<code>代理</code>都有一个关联的事件循环。一个事件循环具有一个或多个<code>任务队列</code>。任务队列是一组任务。关于任务队列后面会详细说。其中<a href="https://tc39.es/ecma262/#sec-agents">user agents</a>在ecma262中定义，感兴趣的可以点击上面链接查看详情。这里可以简单理解为一个包含执行上下文堆栈，一组作业队列，执行线程等这些东西的概念。</p>
 
-<p>其中<a href="https://tc39.es/ecma262/#sec-agents">user agents</a>在ecma262中定义，感兴趣的可以点击上面链接查看详情。这里可以简单理解为一个包含执行上下文堆栈，一组作业队列，执行线程等这些东西的概念。</p>
+<h3 id="再看mdn中-事件循环-的描述">再看MDN中“事件循环“的描述：</h3>
 
-<h3 id="再看mdn中-事件循环-的定义">再看MDN中“事件循环“的定义：</h3>
-
-<p>MDN里面写到之所以称之为事件循环，是因为它经常按照类似如下的方式来被实现：</p>
+<p>之所以称之为事件循环，是因为它经常按照类似如下的方式来被实现：</p>
 
 <pre><code>  while (queue.waitForMessage()) {
     queue.processNextMessage();
@@ -214,42 +213,48 @@ foo();
   
 </code></pre>
 
-<p>并且还有&quot;执行至完成&quot;的特点：</p>
-
-<blockquote>
-<p>每一个消息完整地执行后，其它消息才会被执行。这为程序的分析提供了一些优秀的特性，包括：一个函数执行时，它永远不会被抢占，并且在其他代码运行之前完全运行（且可以修改此函数操作的数据）。这与C语言不同，例如，如果函数在线程中运行，它可能在任何位置被终止，然后在另一个线程中运行其他代码。这个模型的一个缺点在于当一个消息需要太长时间才能处理完毕时，Web应用就无法处理用户的交互，例如点击或滚动。浏览器用“程序需要过长时间运行”的对话框来缓解这个问题。一个很好的做法是缩短消息处理，并在可能的情况下将一个消息裁剪成多个消息。</p>
-</blockquote>
+<p>并且还有&quot;<code>执行至完成</code>&quot;的特点：
+&gt;每一个消息完整地执行后，其它消息才会被执行。这为程序的分析提供了一些优秀的特性，包括：一个函数执行时，它永远不会被抢占，并且在其他代码运行之前完全运行（且可以修改此函数操作的数据）。这与C语言不同，例如，如果函数在线程中运行，它可能在任何位置被终止，然后在另一个线程中运行其他代码。这个模型的一个缺点在于当一个消息需要太长时间才能处理完毕时，Web应用就无法处理用户的交互，例如点击或滚动。浏览器用“程序需要过长时间运行”的对话框来缓解这个问题。一个很好的做法是缩短消息处理，并在可能的情况下将一个消息裁剪成多个消息。</p>
 
 <p><img src="https://cdn.steemitimages.com/DQmZi7BW4ughjDezLyNmLEEXDXybUG63Fc2vcN9gw4ThHqs/image.png" alt="" /></p>
 
-<!-- 
-JavaScript引擎遇到一个异步事件后并不会一直等待其返回结果，而是会将这个事件挂起，继续执行执行栈中的其他任务。当一个异步事件返回结果后，js会将这个事件加入与当前执行栈不同的另一个队列，我们称之为事件队列。被放入事件队列不会立刻执行其回调，而是等待当前执行栈中的所有任务都执行完毕， 主线程处于闲置状态时，主线程会去查找事件队列是否有任务。如果有，那么主线程会从中取出排在第一位的事件，并把这个事件对应的回调放入执行栈中，然后执行其中的同步代码...，如此反复，这样就形成了一个无限的循环。这就是这个过程被称为“事件循环（Event Loop）”的原因。
- -->
+<p>综合各种规范和来自“民间”的共识，我得出的结论是这样的：</p>
 
-<!-- `也就是说JavaScript引擎通过事件循环来处理异步任务，遇到异步任务并不会直接放到主线程的执行栈来执行，而是交给其它线程来处理，比如HTTP异步请求线程,定时器线程`
-`事件循环只能算JS实现异步的一种方式，其它编程语言还有很多不同的实现方式`  
- -->
+<h4 id="事件循环就是不断读取和执行任务队列中任务的过程-任务队列中的任务可能包含同步任务和异步任务-并且一个任务执行的过程是不能被中断的"><code>事件循环就是不断读取和执行任务队列中任务的过程。任务队列中的任务可能包含同步任务和异步任务，并且一个任务执行的过程是不能被中断的。</code></h4>
 
-<blockquote>
-<p>An event loop has one or more task queues. A task queue is a set of tasks.
-一个事件循环具有一个或多个任务队列。任务队列是一组任务。
-Per its source field, each task is defined as coming from a specific task source. For each event loop, every task source must be associated with a specific task queue.
-每个 任务 都定义为来自特定的 任务源。 来自特定 任务源 和指向特定的 事件循环 的的所有任务（例如，由一个 Document 的定时器生成的回调、Document 上鼠标移动触发的事件、 为 Document 的解析器入队的任务）必须总是被添加到同一个 任务队列， 但来自不同 任务源 的 任务 可以放在不同的 任务队列 中。</p>
-</blockquote>
+<p>有没有发现，说了半天其实真正的主角是<code>任务队列</code>, 别急😂，说好的各个击破。。。</p>
 
-<h1 id="task定义">Task定义：</h1>
+<h1 id="任务队列-https-html-spec-whatwg-org-multipage-webappapis-html-task-queue"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#task-queue">任务队列</a></h1>
 
 <blockquote>
-<p>所有任务可以分成两种，一种是同步任务（synchronous），另一种是异步任务（asynchronous）。同步任务指的是，在<code>主线程</code>上排队执行的任务，只有前一个任务执行完毕，才能执行后一个任务；异步任务指的是，不进入主线程、而进入<code>&quot;任务队列&quot;</code>（task queue）的任务，只有&quot;任务队列&quot;通知主线程，某个异步任务可以执行了，该任务才会进入主线程执行。</p>
+<p>Per its source field, each task is defined as coming from a specific task source. For each event loop, every task source must be associated with a specific task queue.</p>
+
+<p>Each event loop has a currently running task, which is either a task or null. Initially, this is null. It is used to handle reentrancy.</p>
+
+<p>Each event loop has a microtask queue, which is a queue of microtasks, initially empty. A microtask is a colloquial way of referring to a task that was created via the queue a microtask algorithm.</p>
+
+<p>Each event loop has a performing a microtask checkpoint boolean, which is initially false. It is used to prevent reentrant invocation of the perform a microtask checkpoint algorithm.</p>
+
+<p>Each event loop has associated values event loop begin and event loop end, which are initially unset.</p>
 </blockquote>
 
-<p>⚠️ 异步任务被分为两类：微任务（micro task）和宏任务（macro task）</p>
+<p>规范中写得很详细，这里只引用了部分重要的概念。总结如下：</p>
 
-<p>⚠️ 异步任务被分为两类：微任务（micro task）和宏任务（macro task）</p>
+<ul>
+<li><p>每个任务来自特定任务源，对于每个事件循环，每个任务源都必须与特定任务队列相关联。</p></li>
 
-<p>⚠️ 异步任务被分为两类：微任务（micro task）和宏任务（macro task）</p>
+<li><p>每个事件循环有一个微任务队列，初始值为空。微任务属于任务的一种。</p></li>
 
-<p>⚠️ Node环境和ES6之后才出现微任务的概念</p>
+<li><p>每个事件循环都有一个微任务检查点布尔值，最初为false。它用于防止执行微任务检查点算法的重入调用。</p></li>
+
+<li><p>每个事件循环都具有事件循环开始和事件循环结束的关联值，这些最初未设置。</p></li>
+</ul>
+
+<h4 id="另外规范中提到需要注意的地方">另外规范中提到需要注意的地方：</h4>
+
+<p>⚠️ 任务队列是Sets(集合)，不是队列！！因为事件循环处理模型的第一步是从所选队列中获取第一个可运行任务，而不是使第一个任务出列（dequeue）。Sets在规范中的定义是没有相同item的有序list。这里顺便提一下，<a href="https://tc39.es/ecma262/#sec-jobs-and-job-queues">ECMA T39</a>规范中把任务叫做job，任务队列叫做 Job Queues。并且提到 &quot;A Job Queue is a FIFO queue of PendingJob records&quot;。也就是说ECMA把任务队列当成先进先出的<code>Queue</code>数据结构，WHATWG强调不是<code>Queue</code>，很多文章会直接把任务队列直接当作<code>队列</code>，这里需要注意下。</p>
+
+<p>⚠️ 任务源主要作用是用于区分逻辑上不同类型的任务</p>
 
 <h1 id="任务源-generic-task-sources-https-html-spec-whatwg-org-multipage-webappapis-html-generic-task-sources"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#generic-task-sources">任务源 Generic task sources</a></h1>
 
@@ -264,11 +269,10 @@ Per its source field, each task is defined as coming from a specific task source
 网络任务源被用来响应网络活动。</p></li>
 
 <li><p><strong>history traversal任务源：</strong>
-当调用history.back()等类似的api时，将任务插进task队列。
-根据其源字段，每个任务被定义为来自特定任务源。对于每个事件循环，每个任务源都必须与特定任务队列相关联。</p></li>
+当调用history.back()等类似的api时，将任务插进task队列。</p></li>
 </ul>
 
-<p>task任务源种类非常多，比如ajax的onload，click事件，基本上我们经常绑定的各种dom事件都是task任务源，还有数据库操作（IndexedDB ），需要注意的是setTimeout、setInterval、setImmediate也是task任务源。总结来说task任务源：</p>
+<p>task任务源种类非常多，比如ajax的onload，鼠标click事件，基本上我们经常绑定的各种dom事件都是task任务源，还有数据库操作（IndexedDB ），需要注意的是setTimeout、setInterval、setImmediate也是task任务源。总结来说task任务源有这几种：</p>
 
 <ul>
 <li>setTimeout</li>
@@ -278,43 +282,76 @@ Per its source field, each task is defined as coming from a specific task source
 <li>UI rendering</li>
 </ul>
 
+<h1 id="任务分类">任务分类</h1>
+
+<blockquote>
+<p>所有任务可以分成两种，一种是同步任务（synchronous），另一种是异步任务（asynchronous）。同步任务指的是，在<code>主线程</code>上排队执行的任务，只有前一个任务执行完毕，才能执行后一个任务；异步任务指的是，不进入主线程、而进入<code>&quot;任务队列&quot;</code>（task queue）的任务，只有&quot;任务队列&quot;通知主线程，某个异步任务可以执行了，该任务才会进入主线程执行。</p>
+</blockquote>
+
+<p>上面一段是来自阮一峰博客，虽然写于2014年，但是这么归类现在看也没错，但是需要修订一下。😄</p>
+
+<h4 id="任务一般可以分成两种-一种是宏任务-macrotask-另一种是微任务-microtask-宏任务包含同步任务和异步任务-微任务都是异步任务"><code>任务一般可以分成两种，一种是宏任务（macrotask），另一种是微任务（microtask）。宏任务包含同步任务和异步任务，微任务都是异步任务。</code></h4>
+
+<p>在WHATWG的规范中并没有找到关于macrotask的定义，但是一般大家的共识是把task就当作macrotask，与之相对的是microtask。</p>
+
+<p>⚠️ Node环境和ES6之后才出现微任务的概念</p>
+
 <h1 id="macrotask">macrotask</h1>
 
-<p>包含执行整体的js代码，事件回调，XHR回调，定时器（setTimeout/setInterval/setImmediate），IO操作，UI render</p>
+<p>script主代码，事件回调，XHR回调，定时器（setTimeout/setInterval/setImmediate），IO操作，UI render</p>
 
 <h1 id="microtask">microtask</h1>
 
-<p>更新应用程序状态的任务，包括promise回调，MutationObserver，process.nextTick，Object.observe</p>
+<p>promise回调，MutationObserver，process.nextTick，Object.observe</p>
+
+<h1 id="任务执行顺序">任务执行顺序</h1>
+
+<p>基本需要的概念都有了，现在开始说最本文最重要的部分，macrotask和microtask执行顺序</p>
+
+<ol>
+<li><p>script主代码被推入<code>执行栈</code>，执行其中的同步代码，遇到异步代码会依次将任务分类放入macrotask队列和microtask队列</p></li>
+
+<li><p>检测macrotask队列是否有宏任务待执行，如果有则取出第一个执行，注意一次循环只能执行一个宏任务⚠️</p></li>
+
+<li><p>检测microtask队列是否有微任务待执行，如果有则取出第一个执行，然后再检测，如果还有再取出再执行，直到microtask队列为空</p></li>
+
+<li><p>执行渲染更新UI，这里注意渲染ui不是必须的，和浏览器策略又关，不同浏览器可能会有不同表现</p></li>
+
+<li><p>重复上述步骤，直到两个任务队列都为空</p></li>
+</ol>
+
+<p>上面是基本任务执行过程，更详细的过程中可能还会包含Web worker，requestAnimationFrame和requestIdleCallback。很多文章把requestAnimationFrame归类为macrotask，但是我并没有找到出处，requestAnimationFrame属于异步任务但是不在任务队列中，我更偏向于认为既不属于macrotask也不属于microtask，有知道出处的朋友欢迎来交流。</p>
+
+<h2 id="再来看开篇的问题">再来看开篇的问题：</h2>
+
+<pre><code>console.log('script start');
+
+setTimeout(function() {
+  console.log('setTimeout');
+}, 0);
+
+Promise.resolve().then(function() {
+  console.log('promise1');
+}).then(function() {
+  console.log('promise2');
+});
+
+console.log('script end');
+</code></pre>
+
+<p>下面是copy过来的一张图，执行过程非常清晰：</p>
 
 <p><img src="https://cdn.steemitimages.com/DQmWmZxQbUkx4w5u7jiydS5yGCxpYmf79Aj4JMcghnu7nHN/browser-deom1-excute-animate.gif" alt="browser-deom1-excute-animate.gif" /></p>
 
-<pre><code>	console.log('script start');
+<!-- 
+JavaScript引擎遇到一个异步事件后并不会一直等待其返回结果，而是会将这个事件挂起，继续执行执行栈中的其他任务。当一个异步事件返回结果后，js会将这个事件加入与当前执行栈不同的另一个队列，我们称之为事件队列。被放入事件队列不会立刻执行其回调，而是等待当前执行栈中的所有任务都执行完毕， 主线程处于闲置状态时，主线程会去查找事件队列是否有任务。如果有，那么主线程会从中取出排在第一位的事件，并把这个事件对应的回调放入执行栈中，然后执行其中的同步代码...，如此反复，这样就形成了一个无限的循环。这就是这个过程被称为“事件循环（Event Loop）”的原因。
+ -->
 
-	setTimeout(function() {
-	  console.log('setTimeout');
-	  Promise.resolve().then(function() {
-		console.log('promise3');
-	  }).then(function() {
-		console.log('promise4');
-	  });
-	}, 0);
-	setTimeout(function() {
-	  Promise.resolve().then(function() {
-		console.log('promise5');
-	  }).then(function() {
-		console.log('promise6');
-	  });
-	}, 0);
-	Promise.resolve().then(function() {
-	  console.log('promise1');
-	}).then(function() {
-	  console.log('promise2');
-	});
+<!-- `也就是说JavaScript引擎通过事件循环来处理异步任务，遇到异步任务并不会直接放到主线程的执行栈来执行，而是交给其它线程来处理，比如HTTP异步请求线程,定时器线程`
+`事件循环只能算JS实现异步的一种方式，其它编程语言还有很多不同的实现方式`  
+ -->
 
-	console.log('script end');
-</code></pre>
-
-<p>用JS来实现</p>
+<h1 id="用js实现的event-loop过程">用JS实现的Event Loop过程</h1>
 
 <pre><code>class JsEngine {
     ...
@@ -396,13 +433,11 @@ button.addEventListener('click', function CB1() {
 
 </code></pre>
 
-<p>如果这个两个问题你都能人肉parse在脑中run出正确结果，那说明你真的懂了。否则，再重新多看几遍，下面的参考资料值得都看一遍。</p>
+<p>如果这个两个问题你都能人肉parse在脑中得出正确结果，那说明你真的懂了。否则，再重新多看几遍，下面的参考资料值得都看一遍。</p>
 
 <p>不懂不写，就酱。</p>
 
 <h1 id="需要研究的内容太多-未完待续">需要研究的内容太多，未完待续。。。</h1>
-
-<h1 id="未完待续-坚持不懂不写">未完待续，坚持不懂不写。。</h1>
 
 <p>参考资料：</p>
 
@@ -410,14 +445,11 @@ button.addEventListener('click', function CB1() {
 
 <ul>
 <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop">WHATWG官方event-loop规范</a></li>
+<li><a href="https://tc39.es/ecma262/#sec-jobs-and-job-queues">ecma262 sec-jobs-and-job-queues</a></li>
 <li><a href="https://tc39.es/ecma262/#sec-agents">ECMA262中Agent的定义</a></li>
-<li><a href="http://www.xiaojichao.com/post/jscorev2.html#toc-fc9/">JavaScript：核心 - 第二版&lt;翻译&gt;</a></li>
 <li><a href="https://imweb.io/topic/58e3bfa845e5c13468f567d5">浏览器进程？线程？傻傻分不清楚！</a></li>
 <li><a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/">tasks-microtasks-queues-and-schedules</a></li>
-<li><a href="https://www.zcfy.cc/article/tasks-microtasks-queues-and-schedules">任务、微任务、队列和时间表&lt;翻译&gt;</a></li>
 <li><a href="https://github.com/aooy/blog/issues/5">从event loop规范探究javaScript异步及浏览器更新渲染时机</a></li>
-<li><a href="https://savokiss.com/tech/learning-microtask-and-macrotask.html">浅析 JS 事件循环之 Microtask 和 Macrotask</a></li>
-<li><a href="https://savokiss.com/tech/event-loop.html">浅析 JS 中的 EventLoop 事件循环（新手向）</a></li>
 <li><a href="http://www.kenote.me/notes/notedetail.html?fileId=388">JS:macrotask和microtask</a></li>
 <li><a href="https://juejin.im/post/59e85eebf265da430d571f89">这一次，彻底弄懂 JavaScript 执行机制</a></li>
 <li><a href="http://lynnelv.github.io/js-event-loop-browser">深入理解js事件循环机制（浏览器篇）</a></li>
@@ -431,6 +463,7 @@ button.addEventListener('click', function CB1() {
 <li><a href="https://juejin.im/post/5c7a9b92518825153f784e14">JS引擎线程的执行过程的三个阶段</a></li>
 <li><a href="https://juejin.im/post/5cd9854b5188252035420a13">你真的理解$nextTick么</a></li>
 <li><a href="https://juejin.im/post/5a6ad46ef265da3e513352c8">JavaScript异步机制详解</a></li>
+<li><a href="https://juejin.im/post/5c337ae06fb9a049bc4cd218">Node的事件循环</a></li>
 </ul>
 </div>
         <div class="post_footer">
