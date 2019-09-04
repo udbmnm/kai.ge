@@ -53,7 +53,7 @@ contentdir = "content"
 # You can get your appid and appkey from https://leancloud.cn
 # more info please open https://valine.js.org
 [params.valine]
-  enable = false
+  enable = true
   appId = ""
   appKey = ""
   placeholder = " "
