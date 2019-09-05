@@ -180,7 +180,7 @@ foo();
 #### `任务一般可以分成两种，一种是同步任务（synchronous），另一种是异步任务（asynchronous）。异步任务也可以分为两种，一种是宏任务（macrotask），另一种是微任务（microtask）。宏任务包含同步任务和异步任务，微任务都是异步任务。`
 在WHATWG的规范中并没有找到关于macrotask的定义，但是一般大家的共识是把task就当作macrotask，与之相对的是microtask。
 
-⚠️ ES6+和Node环境才出现微任务的概念，比如Promise和process.nextTick，之前只需要理解同步任务和异步任务就行了，
+⚠️ ES6+和Node环境才出现微任务的概念，比如Promise和process.nextTick，在这之前只需要理解同步任务和异步任务就行了。
 
 # macrotask来源：
 script主代码，事件回调，XHR回调，定时器（setTimeout/setInterval/setImmediate），IO操作，UI render
@@ -188,21 +188,22 @@ script主代码，事件回调，XHR回调，定时器（setTimeout/setInterval/
 promise回调，MutationObserver，process.nextTick，Object.observe
 
 # 任务执行顺序
-基本需要的概念都有了，现在开始说最本文最重要的部分，macrotask和microtask执行顺序
+基本需要的概念都有了，现在开始本文最重要的概念，macrotask和microtask执行顺序：
 
 1. script主代码被推入`执行栈`，执行其中的同步代码，遇到异步代码会依次将任务分类放入macrotask队列和microtask队列
+2. 继续执行`执行栈`中的同步代码，此时事件队列中的事件将被忽略，直到堆栈为空
+3. 检测macrotask队列是否有宏任务待执行，如果有则取出第一个放入`执行栈`执行，注意一次事件循环只能执行一个宏任务⚠️
+4. 执行完宏任务，开始检测microtask队列是否有微任务待执行，如果有则取出第一个放入`执行栈`执行，然后再检测，如果还有再取出再执行，直到microtask队列为空
+6. 如果有注册requestAnimationFrame，执行requestAnimationFrame，requestAnimationFrame属于渲染过程，并且总是在渲染之前执行
+5. 执行渲染更新UI，这里注意渲染ui不是必须的，和浏览器策略，硬件约束等有关，不同浏览器可能会有不同表现
+6. 重复上述步骤，直到两个任务队列都为空
 
-2. 检测macrotask队列是否有宏任务待执行，如果有则取出第一个执行，注意一次循环只能执行一个宏任务⚠️
+上面是任务队列基本执行过程，`执行栈`被标红了，因为最终队列中的任务都在Javascript主线程执行。更详细的过程中可能还会包含Web worker和requestIdleCallback。很多文章把requestAnimationFrame归类为macrotask，但是我并没有找到明确的出处。另外，requestAnimationFrame虽然属于异步任务但是不在任务队列中，我无法确定requestAnimationFrame是否属于macrotask，有知道的朋友欢迎来交流。
 
-3. 检测microtask队列是否有微任务待执行，如果有则取出第一个执行，然后再检测，如果还有再取出再执行，直到microtask队列为空
+## ⚠️ 小知识
+>规范没有要求任何特定的模型来选择渲染时机。但是，如果浏览器试图达到60Hz的刷新率，那么渲染机会最多每秒60次（约1000/60≈16.7ms）发生。如果浏览器发现一个浏览器上下文不能够维持这个速度，它有可能降低到30次每秒，而不是偶尔丢帧。类似地，如果浏览上下文不可见，则用户代理可能决定将该页面降低到每秒4次渲染，甚至更少。
 
-4. 执行渲染更新UI，这里注意渲染ui不是必须的，和浏览器策略又关，不同浏览器可能会有不同表现
-
-5. 重复上述步骤，直到两个任务队列都为空
-
-
-上面是任务队列基本执行过程，更详细的过程中还会包含Web worker，requestAnimationFrame和requestIdleCallback。很多文章把requestAnimationFrame归类为macrotask，但是我并没有找到出处，requestAnimationFrame属于异步任务但是不在任务队列中，我更偏向于认为既不属于macrotask也不属于microtask，有知道出处的朋友欢迎来交流。
-
+上面是关于UI渲染更新规范中特别提到的。由于页面是一帧一帧绘制出来的，当每秒绘制的帧数（FPS）达到60时页面是非常流畅的，小于这个值时就会感觉到页面卡顿。每一帧的时间大概是1000/60≈16.7ms，也就是说如果浏览器在一帧的时间内（16.7ms）事情没干完就会出现卡顿。因为JS引擎线程和GUI渲染线程是互斥的，JS引擎线程如果一直阻塞，GUI渲染线程就一直没机会工作。所以为了页面表现更流畅，就需要避免写可能阻塞JS引擎线程的代码。比如不要写执行时间可能过久的循环，不要有太多的microtask，因为不管有多少个microtask都会在一次循环中执行完，使用macrotask不会有阻塞的问题，因为宏任务总是每个循环只执行一个。
 
 ## 再来看开篇的问题：
 ```
@@ -236,7 +237,7 @@ console.log('script end');
 
 # 再来看看Vue.$nextTick中的应用
 
-先看Vue.js 2.5.17的实现。
+先看Vue.js 2.5.17的实现：
 
 ```
 import { noop } from 'shared/util'
@@ -356,8 +357,95 @@ export function nextTick (cb?: Function, ctx?: Object) {
 
 ```
 
-Vue2.5对于 macrotask 的实现，优先检测是否支持原生setImmediate，这是一个高版本 IE 和 Edge 才支持的特性，不支持的话再去检测是否支持原生的 MessageChannel，如果也不支持的话就会降级为setTimeout 0；而对于 microtask 的实现，则检测浏览器是否原生支持 Promise，不支持的话直接指向 macrotask 的实现。
+Vue2.5对于 macrotask 的实现，优先检测是否支持原生setImmediate，这是一个高版本 IE 和 Edge 才支持的特性，不支持的话再去检测是否支持原生的 MessageChannel，如果也不支持的话就会降级为setTimeout 0；而对于 microtask 的实现，则检测浏览器是否原生支持 Promise，不支持的话直接  microTimerFunc = macroTimerFunc，也就是说Vue2.5是优先使用microtask来执行nextTick中的任务的。
 
+#### 再来看看Vue.js 2.6版本的实现：
+
+```
+	
+if (typeof Promise !== 'undefined' && isNative(Promise)) {
+  const p = Promise.resolve()
+  timerFunc = () => {
+    p.then(flushCallbacks)
+    // In problematic UIWebViews, Promise.then doesn't completely break, but
+    // it can get stuck in a weird state where callbacks are pushed into the
+    // microtask queue but the queue isn't being flushed, until the browser
+    // needs to do some other work, e.g. handle a timer. Therefore we can
+    // "force" the microtask queue to be flushed by adding an empty timer.
+    if (isIOS) setTimeout(noop)
+  }
+  isUsingMicroTask = true
+} else if (!isIE && typeof MutationObserver !== 'undefined' && (
+  isNative(MutationObserver) ||
+  // PhantomJS and iOS 7.x
+  MutationObserver.toString() === '[object MutationObserverConstructor]'
+)) {
+  // Use MutationObserver where native Promise is not available,
+  // e.g. PhantomJS, iOS7, Android 4.4
+  // (#6466 MutationObserver is unreliable in IE11)
+  let counter = 1
+  const observer = new MutationObserver(flushCallbacks)
+  const textNode = document.createTextNode(String(counter))
+  observer.observe(textNode, {
+    characterData: true
+  })
+  timerFunc = () => {
+    counter = (counter + 1) % 2
+    textNode.data = String(counter)
+  }
+  isUsingMicroTask = true
+} else if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
+  // Fallback to setImmediate.
+  // Techinically it leverages the (macro) task queue,
+  // but it is still a better choice than setTimeout.
+  timerFunc = () => {
+    setImmediate(flushCallbacks)
+  }
+} else {
+  // Fallback to setTimeout.
+  timerFunc = () => {
+    setTimeout(flushCallbacks, 0)
+  }
+}
+
+export function nextTick (cb?: Function, ctx?: Object) {
+  let _resolve
+  callbacks.push(() => {
+    if (cb) {
+      try {
+        cb.call(ctx)
+      } catch (e) {
+        handleError(e, ctx, 'nextTick')
+      }
+    } else if (_resolve) {
+      _resolve(ctx)
+    }
+  })
+  if (!pending) {
+    pending = true
+    timerFunc()
+  }
+  // $flow-disable-line
+  if (!cb && typeof Promise !== 'undefined') {
+    return new Promise(resolve => {
+      _resolve = resolve
+    })
+  }
+}
+
+```
+
+Vue2.6对于 macrotask 的实现，优先检测是否支持原生Promise，然后是检测是否支持MutationObserver，然后是setImmediate，最后都不支持就使用setTimeout。可以明显看出和2.5版本是相反的，也就是优先使用microtask来执行$nextTick里面的回调。
+
+Vue对于$nextTick的实现改动了很多的版本，据我所知 Vue.js 2.5版本之前使用的microtask优先，2.5版本修改成macrotask优先，2.6版本又切换回microtask，至于具体原因尤大大也有提到：
+
+>在 2.5 当中我们引入了一个改动，使得当一个 v-on DOM 事件侦听器触发更新时，会使用 Macrotask 而不是 Microtask 来进行异步缓冲。这原本是为了修正一类浏览器的特殊边际情况导致的 bug 才引入的，但这个改动本身却导致了更多其它的问题。在 2.6 里面我们对于原本的边际情况找到了更简单的 fix，因此这个 Macrotask 的改动也就没有必要了。现在 nextTick 将会统一全部使用 Microtask。如果你对具体的细节感兴趣，可以看[这里](https://gist.github.com/yyx990803/d1a0eaac052654f93a1ccaab072076dd)。
+
+
+
+# Node中的Event Loop：
+
+### 占位待写。。。
 
 
 # 下面是网友用JS实现的Event Loop过程：
@@ -462,17 +550,13 @@ button.addEventListener('click', function CB1() {
 * [浏览器进程？线程？傻傻分不清楚！](https://imweb.io/topic/58e3bfa845e5c13468f567d5)
 * [tasks-microtasks-queues-and-schedules](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)
 * [从event loop规范探究javaScript异步及浏览器更新渲染时机](https://github.com/aooy/blog/issues/5)
-* [JS:macrotask和microtask](http://www.kenote.me/notes/notedetail.html?fileId=388)
-* [这一次，彻底弄懂 JavaScript 执行机制](https://juejin.im/post/59e85eebf265da430d571f89)
 * [深入理解js事件循环机制（浏览器篇）](http://lynnelv.github.io/js-event-loop-browser)
 * [JavaScript 运行机制详解：再谈Event Loop](http://www.ruanyifeng.com/blog/2014/10/event-loop.html)
 * [event-loop规范翻译](https://whatwg-cn.github.io/html/multipage/webappapis.html#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF)
 * [关于JavaScript单线程的一些事](https://github.com/JChehe/blog/blob/master/posts/%E5%85%B3%E4%BA%8EJavaScript%E5%8D%95%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BA%8B.md)
 * [深入浏览器的事件循环 (GDD@2018)](https://zhuanlan.zhihu.com/p/45111890)
-* [Reverting nextTick to Always Use Microtask](https://gist.github.com/yyx990803/d1a0eaac052654f93a1ccaab072076dd)
+* [Vue 2.6 Reverting nextTick to Always Use Microtask](https://gist.github.com/yyx990803/d1a0eaac052654f93a1ccaab072076dd)
 * [模拟实现 JS 引擎：深入了解 JS机制 以及 Microtask and Macrotask](https://juejin.im/post/5c4041805188252420629086#heading-0)
-* [总结：JavaScript异步、事件循环与消息队列、微任务与宏任务](https://juejin.im/post/5be5a0b96fb9a049d518febc)
-* [JS引擎线程的执行过程的三个阶段](https://juejin.im/post/5c7a9b92518825153f784e14)
 * [你真的理解$nextTick么](https://juejin.im/post/5cd9854b5188252035420a13)
-* [JavaScript异步机制详解](https://juejin.im/post/5a6ad46ef265da3e513352c8)
 * [Node的事件循环](https://juejin.im/post/5c337ae06fb9a049bc4cd218)
+* [深入探究 eventloop 与浏览器渲染的时序问题](https://www.404forest.com/2017/07/18/how-javascript-actually-works-eventloop-and-uirendering/)
