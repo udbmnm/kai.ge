@@ -331,7 +331,7 @@ An event loop has one or more task queues. A task queue is a set of tasks.</p>
 <p>规范没有要求任何特定的模型来选择渲染时机。但是，如果浏览器试图达到60Hz的刷新率，那么渲染机会最多每秒60次（约1000/60≈16.7ms）发生。如果浏览器发现一个浏览器上下文不能够维持这个速度，它有可能降低到30次每秒，而不是偶尔丢帧。类似地，如果浏览上下文不可见，则用户代理可能决定将该页面降低到每秒4次渲染，甚至更少。</p>
 </blockquote>
 
-<p>上面是关于UI渲染更新规范中特别提到的。由于页面是一帧一帧绘制出来的，当每秒绘制的帧数（FPS）达到60时页面是非常流畅的，小于这个值时就会感觉到页面卡顿。每一帧的时间大概是1000/60≈16.7ms，也就是说如果浏览器在一帧的时间内（16.7ms）事情没干完就会出现卡顿。因为JS引擎线程和GUI渲染线程是互斥的，JS引擎线程如果一直阻塞，GUI渲染线程就一直没机会工作。所以为了页面表现更流畅，就需要避免写可能阻塞JS引擎线程的代码。比如不要写执行时间可能过久的循环，不要有太多的microtask，因为不管有多少个microtask都会在一次循环中执行完，使用macrotask不会有阻塞的问题，因为宏任务总是每个循环只执行一个。</p>
+<p>上面是关于UI渲染更新规范中特别提到的。由于页面是一帧一帧绘制出来的，当每秒绘制的帧数（FPS）达到60时页面是非常流畅的，小于这个值时就会感觉到页面卡顿。每一帧的时间大概是1000/60≈16.7ms，也就是说如果浏览器在一帧的时间内（小于16.7ms的）事情没干完就会出现卡顿。因为JS引擎线程和GUI渲染线程是互斥的，JS引擎线程如果一直阻塞，GUI渲染线程就一直没机会工作。所以为了页面表现更流畅，就需要避免写可能阻塞JS引擎线程的代码。比如不要写执行时间可能过久的循环，不要有太多的microtask，因为不管有多少个microtask都会在一次循环中执行完，使用macrotask不会有阻塞的问题，因为宏任务总是每个循环只执行一个。</p>
 
 <h2 id="再来看开篇的问题">再来看开篇的问题：</h2>
 
@@ -489,7 +489,7 @@ export function nextTick (cb?: Function, ctx?: Object) {
 
 <p>Vue2.5对于 macrotask 的实现，优先检测是否支持原生setImmediate，这是一个高版本 IE 和 Edge 才支持的特性，不支持的话再去检测是否支持原生的 MessageChannel，如果也不支持的话就会降级为setTimeout 0；而对于 microtask 的实现，则检测浏览器是否原生支持 Promise，不支持的话直接  microTimerFunc = macroTimerFunc，也就是说Vue2.5是优先使用microtask来执行nextTick中的任务的。</p>
 
-<h4 id="再来看看vue-js-2-6版本的实现">再来看看Vue.js 2.6版本的实现：</h4>
+<h3 id="再来看看vue-js-2-6版本的实现">再来看看Vue.js 2.6版本的实现：</h3>
 
 <pre><code>	
 if (typeof Promise !== 'undefined' &amp;&amp; isNative(Promise)) {
@@ -574,48 +574,114 @@ export function nextTick (cb?: Function, ctx?: Object) {
 
 <h1 id="node中的event-loop">Node中的Event Loop：</h1>
 
-<h3 id="占位待写">占位待写。。。</h3>
+<p>当 Node.js 启动后，它会初始化事件轮询，每一个event loop都会包含按如下顺序六个循环阶段。</p>
 
-<h1 id="下面是网友用js实现的event-loop过程">下面是网友用JS实现的Event Loop过程：</h1>
+<pre><code>   ┌───────────────────────────┐
+┌─&gt;│           timers          │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │     pending callbacks     │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │       idle, prepare       │
+│  └─────────────┬─────────────┘      ┌───────────────┐
+│  ┌─────────────┴─────────────┐      │   incoming:   │
+│  │           poll            │&lt;─────┤  connections, │
+│  └─────────────┬─────────────┘      │   data, etc.  │
+│  ┌─────────────┴─────────────┐      └───────────────┘
+│  │           check           │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+└──┤      close callbacks      │
+   └───────────────────────────┘
+</code></pre>
 
-<pre><code>class JsEngine {
-    ...
-    // 与event-loop中的初始化对应
-    constructor(tasks) {
-        this.jsStack = tasks;
-        this.runScript(this.runScriptHandler);
-    }
-    runScript(task) {
-    	this.macroTaskQueue.push(task);
-    }
-	runScriptHandler = () =&gt; {
-        let curTask = this.jsStack.shift();
-        while (curTask) {
-          	this.runTask(curTask);
-          	curTask = this.jsStack.shift();
-        }
-    }
-    runMacroTask() {
-        const { microTaskQueue, macroTaskQueue } = this;
-		// 根据上述规律，定义macroTaskQueue与microTaskQueue执行的先后顺序
-        macroTaskQueue.forEach(macrotask =&gt; {
-        	macrotask();
-          	if (microTaskQueue.length) {
-            	let curMicroTask = microTaskQueue.pop();
-            	while (curMicroTask) {
-              		this.runTask(microTaskQueue);
-             		curMicroTask = microTaskQueue.pop();
-            	}
-        	}
-        });
-    }
-	// 运行task
-    runTask(task) {
-    	new Function(task)();
-    }
-}
+<ul>
+<li>timers : 这个阶段执行setTimeout(callback) 和 setInterval(callback)预定的callback</li>
+<li>I/O callbacks : 执行延迟到下一个循环迭代的 I/O 回调</li>
+<li>idle, prepare : 仅node内部使用</li>
+<li>poll : 检索新的 I/O 事件;执行与 I/O 相关的回调（几乎所有情况下，除了close事件的callbacks、被timers(定时器，setTimeout、setInterval等)设定的callbacks、setImmediate设定的callbacks之外的callbacks），适当的条件下node将阻塞在这里</li>
+<li>check : setImmediate() 回调函数在这里执行</li>
+<li>close callbacks : 一些准备关闭的回调函数，如：socket.on('close'，callback)</li>
+</ul>
+
+<p>在每次运行的事件循环之间，Node.js 检查它是否在等待任何异步 I/O 或计时器，如果没有的话就干净的关闭。</p>
+
+<p>⚠️<code>注意上面六个阶段都不包括 process.nextTick()</code></p>
+
+<h2 id="setimmediate-对比-settimeout">setImmediate() 对比 setTimeout()</h2>
+
+<p>setImmediate() 和 setTimeout() 很类似，但何时调用行为完全不同。</p>
+
+<ul>
+<li>setImmediate：在当前轮询阶段完成后执行脚本，也就是在poll阶段完成时执行，即check阶段</li>
+<li>setTimeout：在毫秒的最小阈值经过后运行的脚本，timer阶段执行</li>
+</ul>
+
+<p>执行计时器的顺序将根据调用它们的上下文而异。如果二者都从主模块内调用，则计时将受进程性能的约束（这可能会受到计算机上运行的其它应用程序的影响）。</p>
+
+<pre><code>setTimeout(() =&gt; {
+  console.log('timeout');
+}, 0);
+
+setImmediate(() =&gt; {
+  console.log('immediate');
+});
 
 </code></pre>
+
+<p>上面的例子在不属于I/O周期调用时，执行的先后顺序时<code>不确定的</code>，我把setTimeout的时间改为1ms后结果也是不确定的，这是因为Node做不到0毫秒，最少也需要1毫秒，可以理解成setTimeout(cb, 0) === setTimeout(cb, 1)，<a href="https://nodejs.org/api/timers.html#timers_settimeout_callback_delay_args">官方文档</a>中有说明。改成2ms后setImmediate总是先执行。关于执行顺序的先后问题在<a href="https://cnodejs.org/topic/57d68794cb6f605d360105bf">这里</a>有大佬通过源码详细讲解。</p>
+
+<pre><code>// timeout_vs_immediate.js
+const fs = require('fs');
+
+fs.readFile(__filename, () =&gt; {
+  setTimeout(() =&gt; {
+    console.log('timeout');
+  }, 0);
+  setImmediate(() =&gt; {
+    console.log('immediate');
+  });
+});
+
+
+</code></pre>
+
+<p>但是，如果你把这两个函数放入一个 I/O 回调内部，setImmediate 总是被<code>优先调用</code>。</p>
+
+<h2 id="process-nexttick-对比-setimmediate">process.nextTick() 对比 setImmediate()</h2>
+
+<ul>
+<li>process.nextTick不在event loop的任何阶段执行，而是在各个阶段切换的中间执行,即从一个阶段切换到下个阶段前执行。</li>
+
+<li><p>setImmediate在下一次迭代或事件循环的“tick”时触发</p>
+
+<pre><code>setTimeout(() =&gt; {
+ console.log('setTimeout');
+	 process.nextTick(()=&gt;{
+	   console.log('nextTick3');
+	 })
+}, 0);
+setImmediate(() =&gt; {
+ console.log('setImmediate');
+ process.nextTick(()=&gt;{
+   console.log('nextTick4');
+ })
+});
+process.nextTick(()=&gt;{
+ console.log('nextTick1');
+})
+process.nextTick(()=&gt;{
+ console.log('nextTick2');
+})
+
+
+</code></pre></li>
+</ul>
+
+<p>执行结果是nextTick1，nextTick2，setTimeout，nextTick3，setImmediate，nextTick4</p>
+
+<p>可以看到<code>nextTick</code>其实是“名不副实”，它根本和next没毛线关系，但是由于npm包数量太大贸然改名会造成影响。官方建议开发者在所有情况下都使用setImmediate，因为setImmediate更容易理解并且有更广泛的兼容性，比如被浏览器所兼容。</p>
 
 <h1 id="最后来个小菜">最后来个小菜🍖</h1>
 
@@ -662,7 +728,11 @@ button.addEventListener('click', function CB1() {
 
 <p>不懂不写，就酱。</p>
 
-<h1 id="需要研究的内容太多-未完待续">需要研究的内容太多，未完待续。。。</h1>
+<h1 id="后记">后记</h1>
+
+<hr />
+
+<p>由于JavaScript异步机制涉及内容太多，给我的感觉就是越写需要研究的东西越多，我会在适当时机更新，如有大佬发现有误的地方欢迎交流。</p>
 
 <p>参考资料：</p>
 
@@ -678,13 +748,13 @@ button.addEventListener('click', function CB1() {
 <li><a href="http://lynnelv.github.io/js-event-loop-browser">深入理解js事件循环机制（浏览器篇）</a></li>
 <li><a href="http://www.ruanyifeng.com/blog/2014/10/event-loop.html">JavaScript 运行机制详解：再谈Event Loop</a></li>
 <li><a href="https://whatwg-cn.github.io/html/multipage/webappapis.html#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF">event-loop规范翻译</a></li>
-<li><a href="https://github.com/JChehe/blog/blob/master/posts/%E5%85%B3%E4%BA%8EJavaScript%E5%8D%95%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BA%8B.md">关于JavaScript单线程的一些事</a></li>
 <li><a href="https://zhuanlan.zhihu.com/p/45111890">深入浏览器的事件循环 (GDD@2018)</a></li>
 <li><a href="https://gist.github.com/yyx990803/d1a0eaac052654f93a1ccaab072076dd">Vue 2.6 Reverting nextTick to Always Use Microtask</a></li>
 <li><a href="https://juejin.im/post/5c4041805188252420629086#heading-0">模拟实现 JS 引擎：深入了解 JS机制 以及 Microtask and Macrotask</a></li>
 <li><a href="https://juejin.im/post/5cd9854b5188252035420a13">你真的理解$nextTick么</a></li>
 <li><a href="https://juejin.im/post/5c337ae06fb9a049bc4cd218">Node的事件循环</a></li>
 <li><a href="https://www.404forest.com/2017/07/18/how-javascript-actually-works-eventloop-and-uirendering/">深入探究 eventloop 与浏览器渲染的时序问题</a></li>
+<li><a href="https://cnodejs.org/topic/57d68794cb6f605d360105bf">Node.js Event Loop 的理解 Timers，process.nextTick()</a></li>
 </ul>
 </div>
         <div class="post_footer">
