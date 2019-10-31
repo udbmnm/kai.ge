@@ -18,3 +18,17 @@ draft: true
 [前端日报](https://www.d2daily.com/)
 
 [个人支付接入](https://xorpay.com/)
+
+[PAYJS 微信支付个人接口](https://payjs.cn/)
+
+[免费版权图片一键搜索](https://www.logosc.cn/so/)
+
+[免注册不限速大文件传输](https://www.wenshushu.cn/)
+
+[docsmall - 图片压缩、GIF压缩、PDF压缩、PDF合并、PDF分割](https://docsmall.com/)
+
+[创业神器导航 - 分享最酷的互联网工具和创业资源](https://hao.logosc.cn/)
+
+[群体的智慧与愚蠢](https://ncase.me/crowds/zh-CN.html)
+
+[利器](https://liqi.io/)
