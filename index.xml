@@ -6,10 +6,19 @@
     <description>Recent content on 凯哥的个人网站</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 22 Aug 2019 20:19:23 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 31 Oct 2019 17:03:25 +0800</lastBuildDate>
     
 	<atom:link href="https://kai.ge/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>收藏一些可能有用的网站</title>
+      <link>https://kai.ge/fav/</link>
+      <pubDate>Thu, 31 Oct 2019 17:03:25 +0800</pubDate>
+      
+      <guid>https://kai.ge/fav/</guid>
+      <description>找到AI - 找到你喜爱的作品 独立开发者社区 面包多-为创造者创收 创造者日报 - 让灵感完美爆炸 有趣的是一个简单、温暖的小社区 前端日报 个人支付接入</description>
+    </item>
     
     <item>
       <title>不懂不写系列：JavaScript的异步机制，EventLoop，macrotask，microtask，nextTick终结篇</title>

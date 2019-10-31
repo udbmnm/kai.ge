@@ -33,6 +33,11 @@ contentdir = "content"
   identifier = "tags"
   url = "/tags/"
 [[menu.main]]
+  name = "收藏"
+  weight = 35
+  identifier = "fav"
+  url = "/fav"  
+[[menu.main]]
   name = "关于"
   weight = 40
   identifier = "about"
