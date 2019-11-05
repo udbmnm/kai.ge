@@ -46,7 +46,7 @@ contentdir = "content"
 [params]
   subTitle = "kai.ge"                                       # site's subTitle  # 网站二级标题
   footerSlogan = "Invert,always invert."                                          # site's footer slogan  # 网站页脚标语
-  keywords = ["kai.ge", "blog","hugo"]                                  # site's keywords  # 网站关键字
+  keywords = ["kai.ge","凯哥博客", "blog","hugo"]                                  # site's keywords  # 网站关键字
   description = "凯哥的个人网站"                        # site's description  # 网站描述
 
 # mathjax
