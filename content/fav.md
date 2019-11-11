@@ -15,7 +15,7 @@ draft: true
 
 [有趣的是一个简单、温暖的小社区](https://youqu.de/)
 
-[前端日报](https://www.d2daily.com/)
+~~[前端日报](https://www.d2daily.com/)~~
 
 [个人支付接入](https://xorpay.com/)
 
@@ -31,4 +31,8 @@ draft: true
 
 [群体的智慧与愚蠢](https://ncase.me/crowds/zh-CN.html)
 
-[利器](https://liqi.io/)
+[利器 - 优秀的创造者访谈](https://liqi.io/)
+
+[Magi - 结构化知识体系搜索引擎](https://magi.com/)
+
+[dogedoge - 谷歌搜索替代方案](https://www.dogedoge.com/)
