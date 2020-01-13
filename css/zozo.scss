@@ -334,9 +334,8 @@ hr {
   .powered_by {
     margin: 0;
     font-size: 11px;
-
-    a {
-      color: #cccccc;
+    a,span {
+      color: #aaa;
       margin: 0 2px;
 
       &:hover {

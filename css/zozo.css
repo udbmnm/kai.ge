@@ -327,10 +327,11 @@ hr {
 .footer .powered_by {
   margin: 0;
   font-size: 11px;
+  color: #aaa;
 }
 
 .footer .powered_by a {
-  color: #cccccc;
+  color: #aaa;
   margin: 0 2px;
 }
 
