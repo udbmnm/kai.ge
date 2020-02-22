@@ -1,7 +1,7 @@
 ---
 title: "不懂不写系列：JavaScript的异步机制，EventLoop，macrotask，microtask，nextTick终结篇"
 date: 2019-08-22T20:19:23+08:00
-draft: true
+tags: ["javaScript"]
 ---
 
 经常看到下面这样的一个例子：

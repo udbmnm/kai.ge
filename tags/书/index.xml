@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>书 on 凯哥的个人网站</title>
+    <link>https://kai.ge/tags/%E4%B9%A6/</link>
+    <description>Recent content in 书 on 凯哥的个人网站</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 22 Feb 2020 21:49:28 +0800</lastBuildDate>
+    
+	<atom:link href="https://kai.ge/tags/%E4%B9%A6/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>记录阅读之路</title>
+      <link>https://kai.ge/books/</link>
+      <pubDate>Sat, 22 Feb 2020 21:49:28 +0800</pubDate>
+      
+      <guid>https://kai.ge/books/</guid>
+      <description>我这辈子遇到的聪明人没有一个不是每天读书的，没有，一个都没有。沃伦·巴菲特就是一本长了两条腿的书。 -- 查理·芒格 最近几年认识了一些大师和大佬之后，越发觉得读书这件事太重要了。2020年开始，我决定记录一</description>
+    </item>
+    
+  </channel>
+</rss>
