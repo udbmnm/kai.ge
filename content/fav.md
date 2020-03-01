@@ -4,6 +4,7 @@ date: 2019-10-31T17:03:25+08:00
 tags: ["网站"]
 ---
 
+[字由 - 最好用的字体管理利器](https://www.hellofont.cn/)
 
 [找到AI - 找到你喜爱的作品](https://zhaodao.ai/)
 
@@ -12,8 +13,6 @@ tags: ["网站"]
 [面包多 - 为创造者创收](https://mianbaoduo.com)
 
 [创造者日报 - 让灵感完美爆炸](https://creatorsdaily.com/)
-
-[有趣的 - 一个简单、温暖的小社区](https://youqu.de/)
 
 ~~[前端日报](https://www.d2daily.com/)~~
 
@@ -41,3 +40,4 @@ tags: ["网站"]
 
 [uTools - 你的生产力工具集](https://u.tools/)
 
+[有趣的 - 一个简单、温暖的小社区](https://youqu.de/)
