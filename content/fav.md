@@ -39,5 +39,3 @@ tags: ["网站"]
 [dogedoge - 谷歌搜索替代方案](https://www.dogedoge.com/)
 
 [uTools - 你的生产力工具集](https://u.tools/)
-
-[有趣的 - 一个简单、温暖的小社区](https://youqu.de/)

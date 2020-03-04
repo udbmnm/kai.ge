@@ -1,117 +1,5 @@
-<!DOCTYPE html>
-<html lang="zh-cn" >
-<head>
-  <meta charset="utf-8"/>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
-  
-  <meta name="author"
-        content="凯哥"/>
-
-  
-  <meta name="description" content="经常看到下面这样的一个例子： console.log(&#39;script start&#39;); setTimeout(function() { console.log(&#39;setTimeout&#39;); }, 0); Promise.resolve().then(function() { console.log(&#39;promise1&#39;); }).then(function() { console.log(&#39;promise2&#39;); }); console.log(&#39;script end&#39;); 如果你能立马得出答案，感觉就是小菜一碟，那么你可以跳过本文了。。。😄 如果你模棱两可的猜测执行过程，那你肯定没有理解清楚JavaScript的"/>
-  
-
-  
-  
-  <meta name="keywords" content="kai.ge, 凯哥博客, blog, hugo"/>
-  
-
-  
-  <link rel="canonical" href="https://kai.ge/posts/%E4%B8%8D%E6%87%82%E4%B8%8D%E5%86%99%E7%B3%BB%E5%88%97macrotask%E5%92%8Cmicrotask%E7%BB%88%E7%BB%93%E7%89%88/"/>
-
-  
-
-  <title>不懂不写系列：JavaScript的异步机制，EventLoop，macrotask，microtask，nextTick终结篇 &middot; 凯哥的个人网站</title>
-
-  <link rel="shortcut icon" href="https://kai.ge/images/favicon.ico"/>
-  <link rel="stylesheet" href="https://kai.ge/css/animate.min.css"/>
-  <link rel="stylesheet" href="https://kai.ge/css/remixicon.css"/>
-  <link rel="stylesheet" href="https://kai.ge/css/zozo.css"/>
-  <link rel="stylesheet" href="https://kai.ge/css/highlight.css"/>
-
-  
-  
-</head>
-
-<body>
-<div class="main animated">
-  <div class="nav_container animated fadeInDown">
-  <div class="site_nav" id="site_nav">
-    <ul>
-      
-      <li>
-        <a href="/">首页</a>
-      </li>
-      
-      <li>
-        <a href="/posts/">归档</a>
-      </li>
-      
-      <li>
-        <a href="/tags/">标签</a>
-      </li>
-      
-      <li>
-        <a href="/books">读书</a>
-      </li>
-      
-      <li>
-        <a href="/fav">好站</a>
-      </li>
-      
-      <li>
-        <a href="/about/">关于</a>
-      </li>
-      
-    </ul>
-  </div>
-  <div class="menu_icon">
-    <a id="menu_icon"><i class="remixicon-links-line"></i></a>
-  </div>
-</div>
-
-  <div class="header animated fadeInDown">
-  <div class="site_title_container">
-    <div class="site_title">
-      <h1>
-        <a href="https://kai.ge">
-          <span>凯哥的个人网站</span>
-          <img src="https://kai.ge/images/logo.svg"/>
-        </a>
-      </h1>
-    </div>
-    <div class="description">
-      <p class="sub_title">kai.ge</p>
-      <div class="my_socials">
-        
-        
-        <a href="https://github.com/udbmnm" title="github" target="_blank"><i class="remixicon-github-fill"></i></a>
-        
-        
-        
-        <a href="https://twitter.com/udbmnm" title="twitter" target="_blank"><i class="remixicon-twitter-fill"></i></a>
-        
-        
-        <a href="https://kai.ge/index.xml" type="application/rss+xml" title="rss" target="_blank"><i class="remixicon-rss-fill"></i></a>
-      </div>
-    </div>
-  </div>
-</div>
-
-  <div class="content">
-    <div class="post_page">
-      <div class="post animated fadeInDown">
-        <div class="post_title post_detail_title">
-          <h2><a href='/posts/%E4%B8%8D%E6%87%82%E4%B8%8D%E5%86%99%E7%B3%BB%E5%88%97macrotask%E5%92%8Cmicrotask%E7%BB%88%E7%BB%93%E7%89%88/'>不懂不写系列：JavaScript的异步机制，EventLoop，macrotask，microtask，nextTick终结篇</a></h2>
-          <span class="date">2019.08.22</span>
-        </div>
-        <div class="post_content markdown">
-
-<p>经常看到下面这样的一个例子：</p>
-
-<pre><code>console.log('script start');
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=author content=凯哥><meta name=description content="经常看到下面这样的一个例子： console.log('script start'); setTimeout(function() { console.log('setTimeout'); }, 0); Promise.resolve().then(function() { console.log('promise1'); }).then(function() { console.log('promise2'); }); console.log('script end'); 如果你能立马得出答案，感觉就是小菜一碟，那么你可以跳过本文了。。。😄 如果你模棱两可的猜测执行过程，那你肯定没有理解清楚JavaScript的"><meta name=keywords content=kai.ge,凯哥博客,blog,hugo><link rel=canonical href=https://kai.ge/posts/%E4%B8%8D%E6%87%82%E4%B8%8D%E5%86%99%E7%B3%BB%E5%88%97macrotask%E5%92%8Cmicrotask%E7%BB%88%E7%BB%93%E7%89%88/><title>不懂不写系列：JavaScript的异步机制，EventLoop，macrotask，microtask，nextTick终结篇 &middot; 凯哥的个人网站</title><link rel="shortcut icon" href=https://kai.ge/images/favicon.ico><link rel=stylesheet href=https://kai.ge/css/animate.min.css><link rel=stylesheet href=https://kai.ge/css/remixicon.css><link rel=stylesheet href=https://kai.ge/css/zozo.css><link rel=stylesheet href=https://kai.ge/css/highlight.css></head><body><div class="main animated"><div class="nav_container animated fadeInDown"><div class=site_nav id=site_nav><ul><li><a href=/>首页</a></li><li><a href=/posts/>归档</a></li><li><a href=/tags/>标签</a></li><li><a href=/books>读书</a></li><li><a href=/fav>好站</a></li><li><a href=/about/>关于</a></li></ul></div><div class=menu_icon><a id=menu_icon><i class=remixicon-links-line></i></a></div></div><div class="header animated fadeInDown"><div class=site_title_container><div class=site_title><h1><a href=https://kai.ge><span>凯哥的个人网站</span>
+<img src=https://kai.ge/images/logo.svg></a></h1></div><div class=description><p class=sub_title>kai.ge</p><div class=my_socials><a href=https://github.com/udbmnm title=github target=_blank><i class=remixicon-github-fill></i></a><a href=https://twitter.com/udbmnm title=twitter target=_blank><i class=remixicon-twitter-fill></i></a><a href=https://kai.ge/index.xml type=application/rss+xml title=rss target=_blank><i class=remixicon-rss-fill></i></a></div></div></div></div><div class=content><div class=post_page><div class="post animated fadeInDown"><div class="post_title post_detail_title"><h2><a href=/posts/%E4%B8%8D%E6%87%82%E4%B8%8D%E5%86%99%E7%B3%BB%E5%88%97macrotask%E5%92%8Cmicrotask%E7%BB%88%E7%BB%93%E7%89%88/>不懂不写系列：JavaScript的异步机制，EventLoop，macrotask，microtask，nextTick终结篇</a></h2><span class=date>2019.08.22</span></div><div class="post_content markdown"><p>经常看到下面这样的一个例子：</p><pre><code>console.log('script start');
 
 setTimeout(function() {
   console.log('setTimeout');
@@ -124,57 +12,7 @@ Promise.resolve().then(function() {
 });
 
 console.log('script end');
-</code></pre>
-
-<p>如果你能立马得出答案，感觉就是小菜一碟，那么你可以跳过本文了。。。😄</p>
-
-<p>如果你模棱两可的猜测执行过程，那你肯定没有理解清楚JavaScript的异步机制，本文就是为你准备的。我们经常会听到说JavaScript是单线程无阻塞的，单线程怎么能做到无阻塞呢？有的人可能会说因为JavaScript支持异步回调，但是为什么能支持异步？其实理解清楚异步背后的事件循环机制，也就是Event Loop，像上面这些问题就很容易回答了，并且可以弄懂一次就永不出错。上面的例子就不说答案了，答案不在F12，而在于弄懂Event Loop。</p>
-
-<h2 id="下面开始终结之旅">下面开始终结之旅</h2>
-
-<hr />
-
-<p>先看下面这张经常被引用的图，花几秒钟时间先自己想象Event Loop的执行过程...</p>
-
-<p><img src="https://cdn.steemitimages.com/DQmUyZ7SruH55V1TunUpaCLXqG4iYaat7WEoSdBpoLUYa5o/event-loop.jpg" alt="event-loop.jpg" /></p>
-
-<p>几秒钟过后......</p>
-
-<p>好了，可以直观的看出图中包含三个主要的概念：</p>
-
-<p><code>Event Loop</code>，<code>macrotask</code>，<code>microtask</code>。</p>
-
-<p>另外还有一个隐藏的重要的概念：<code>任务队列</code>。</p>
-
-<p>因为事关JavaScript的执行过程，所以还会牵扯出一些其它的基础概念：</p>
-
-<ul>
-<li>进程和线程</li>
-<li>栈和队列</li>
-<li>函数调用栈/执行栈</li>
-</ul>
-
-<p>概念很多，我们各个击破...</p>
-
-<h1 id="进程和线程">进程和线程</h1>
-
-<p>浏览器是是多进程的，每打开一个新的tab或者新窗口都相当于创建了一个新的进程，每个进程都有占有独立的cpu和内存资源，多个进程间互不影响，所以一个页面挂了不会影响其它页面。每个进程包含多个线程，比如GUI渲染线程，JS引擎线程，定时器线程，HTTP异步请求线程,事件触发线程等。经常说的JavaScript是单线程的一般是指js内核引擎线程，比如v8引擎。<strong>进程是系统分配资源的最小单位,线程是CPU调度的最小单位。</strong>另外除了进程和线程外，还有一种微线程，一般被成为协程,一个线程可以包含多个协程，协程是用户自己调度的，没有上下文切换消耗,所以性能非常高，使用协程比较有代表性的就是Golang。</p>
-
-<h1 id="stack-栈-和-queue-队列">Stack（栈）和 Queue（队列）</h1>
-
-<p>Stack和Queue是两种基本的数据结构，而常用的数据结构有八种，还有六种数据结构分别是：数组（Array）、散列表（Hash）、树（Tree）、链表（Linked List）、堆（Heap）、图（Graph）。</p>
-
-<p><strong><code>Stack：</code></strong>Stack是一种FILO（First In, First Out）的数据结构，也就是<code>先进后出</code>。eg：就像羽毛球筒一样，最先放进去最后才能拿出来</p>
-
-<p><strong><code>Queue：</code></strong>队列是一种 FIFO (First In, First Out) 的数据结构，它的特点就是<code>先进先出</code>。eg：去食堂排队吃饭，去的早的排前面的先吃</p>
-
-<h1 id="call-stack-函数调用栈">Call Stack(函数调用栈)</h1>
-
-<p>函数调用栈，也叫执行栈，既然是栈，也是<code>先进后出</code>的，调用栈用于存储代码在执行期间创建的所有<code>执行上下文</code>。首次运行JS代码时，会创建一个全局执行上下文并Push到当前的调用栈中。每当发生函数调用，引擎都会为该函数创建一个新的函数执行上下文并Push到当前调用栈的栈顶。当栈顶函数运行完成后，其对应的函数执行上下文将会从调用栈中Pop出，上下文控制权将移到当前执行栈的下一个执行上下文。（关于执行上下文下次单独拎出来写）</p>
-
-<p>看下面一个例子：</p>
-
-<pre><code>function bar() {
+</code></pre><p>如果你能立马得出答案，感觉就是小菜一碟，那么你可以跳过本文了。。。😄</p><p>如果你模棱两可的猜测执行过程，那你肯定没有理解清楚JavaScript的异步机制，本文就是为你准备的。我们经常会听到说JavaScript是单线程无阻塞的，单线程怎么能做到无阻塞呢？有的人可能会说因为JavaScript支持异步回调，但是为什么能支持异步？其实理解清楚异步背后的事件循环机制，也就是Event Loop，像上面这些问题就很容易回答了，并且可以弄懂一次就永不出错。上面的例子就不说答案了，答案不在F12，而在于弄懂Event Loop。</p><h2 id=下面开始终结之旅>下面开始终结之旅</h2><hr><p>先看下面这张经常被引用的图，花几秒钟时间先自己想象Event Loop的执行过程...</p><p><img src=https://cdn.steemitimages.com/DQmUyZ7SruH55V1TunUpaCLXqG4iYaat7WEoSdBpoLUYa5o/event-loop.jpg alt=event-loop.jpg></p><p>几秒钟过后......</p><p>好了，可以直观的看出图中包含三个主要的概念：</p><p><code>Event Loop</code>，<code>macrotask</code>，<code>microtask</code>。</p><p>另外还有一个隐藏的重要的概念：<code>任务队列</code>。</p><p>因为事关JavaScript的执行过程，所以还会牵扯出一些其它的基础概念：</p><ul><li>进程和线程</li><li>栈和队列</li><li>函数调用栈/执行栈</li></ul><p>概念很多，我们各个击破...</p><h1 id=进程和线程>进程和线程</h1><p>浏览器是是多进程的，每打开一个新的tab或者新窗口都相当于创建了一个新的进程，每个进程都有占有独立的cpu和内存资源，多个进程间互不影响，所以一个页面挂了不会影响其它页面。每个进程包含多个线程，比如GUI渲染线程，JS引擎线程，定时器线程，HTTP异步请求线程,事件触发线程等。经常说的JavaScript是单线程的一般是指js内核引擎线程，比如v8引擎。<strong>进程是系统分配资源的最小单位,线程是CPU调度的最小单位。</strong>另外除了进程和线程外，还有一种微线程，一般被成为协程,一个线程可以包含多个协程，协程是用户自己调度的，没有上下文切换消耗,所以性能非常高，使用协程比较有代表性的就是Golang。</p><h1 id=stack-栈-和-queue-队列>Stack（栈）和 Queue（队列）</h1><p>Stack和Queue是两种基本的数据结构，而常用的数据结构有八种，还有六种数据结构分别是：数组（Array）、散列表（Hash）、树（Tree）、链表（Linked List）、堆（Heap）、图（Graph）。</p><p><strong><code>Stack：</code></strong>Stack是一种FILO（First In, First Out）的数据结构，也就是<code>先进后出</code>。eg：就像羽毛球筒一样，最先放进去最后才能拿出来</p><p><strong><code>Queue：</code></strong>队列是一种 FIFO (First In, First Out) 的数据结构，它的特点就是<code>先进先出</code>。eg：去食堂排队吃饭，去的早的排前面的先吃</p><h1 id=call-stack-函数调用栈>Call Stack(函数调用栈)</h1><p>函数调用栈，也叫执行栈，既然是栈，也是<code>先进后出</code>的，调用栈用于存储代码在执行期间创建的所有<code>执行上下文</code>。首次运行JS代码时，会创建一个全局执行上下文并Push到当前的调用栈中。每当发生函数调用，引擎都会为该函数创建一个新的函数执行上下文并Push到当前调用栈的栈顶。当栈顶函数运行完成后，其对应的函数执行上下文将会从调用栈中Pop出，上下文控制权将移到当前执行栈的下一个执行上下文。（关于执行上下文下次单独拎出来写）</p><p>看下面一个例子：</p><pre><code>function bar() {
 	console.log('bar');
 }
 function foo() {
@@ -182,168 +20,17 @@ function foo() {
 	bar();
 }
 foo();
-</code></pre>
-
-<p>先用文字描述下调用栈执行的过程：</p>
-
-<ol>
-<li>调用foo，<code>foo</code>入栈，目前栈里面有 [foo]</li>
-<li><code>console.log('foo')</code>入栈，目前栈里面有 [console.log('foo'),foo]</li>
-<li>执行<code>console.log('foo')</code>并出栈，目前栈里面有 [foo]</li>
-<li>调用bar，<code>bar</code>入栈，目前栈里面有 [bar,foo]</li>
-<li>执行bar，<code>console.log('bar')</code>入栈，目前栈里面有 [console.log('bar'),bar,foo]</li>
-<li>执行<code>console.log('bar')</code>并出栈，目前栈里面有 [bar,foo]</li>
-<li>bar执行完毕被弹出，目前栈里面有 [foo]</li>
-<li>foo执行完毕被弹出，目前栈为空 []</li>
-</ol>
-
-<p>下面是copy过来的图，看起来更直观：
-<img src="https://cdn.steemitimages.com/DQmStyEA5rYjaWeGLRbpxuMAs6uY21nLS2n4xwbb2fEsKAY/image.png" alt="" /></p>
-
-<p>回顾完上面的基础概念后，下面开始本文的主要内容。</p>
-
-<h1 id="event-loop是什么-https-html-spec-whatwg-org-multipage-webappapis-html-event-loop"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop">Event Loop是什么？</a></h1>
-
-<h4 id="先看whatag的定义">先看WHATAG的定义：</h4>
-
-<blockquote>
-<p>To coordinate events, user interaction, scripts, rendering, networking, and so forth, <a href="https://tc39.es/ecma262/#sec-agents">user agents</a> must use event loops as described in this section. Each agent has an associated event loop.
-An event loop has one or more task queues. A task queue is a set of tasks.</p>
-</blockquote>
-
-<p>翻译过来就是，为了协调事件、用户交互、脚本、渲染、网络等，<code>用户代理</code>必须使用这一小节描述的<code>事件循环</code>。每个<code>代理</code>都有一个关联的事件循环。一个事件循环具有一个或多个<code>任务队列</code>。任务队列是一组任务。关于任务队列后面会详细说。其中<a href="https://tc39.es/ecma262/#sec-agents">用户代理（user agents）</a>在ecma262中定义，感兴趣的可以点击上面链接查看详情。这里可以简单理解为一个包含执行上下文堆栈，一组作业队列，执行线程等这些东西的概念。</p>
-
-<h3 id="再看mdn中-事件循环-的描述">再看MDN中“事件循环“的描述：</h3>
-
-<p>之所以称之为事件循环，是因为它经常按照类似如下的方式来被实现：</p>
-
-<pre><code>  while (queue.waitForMessage()) {
+</code></pre><p>先用文字描述下调用栈执行的过程：</p><ol><li>调用foo，<code>foo</code>入栈，目前栈里面有 [foo]</li><li><code>console.log('foo')</code>入栈，目前栈里面有 [console.log('foo'),foo]</li><li>执行<code>console.log('foo')</code>并出栈，目前栈里面有 [foo]</li><li>调用bar，<code>bar</code>入栈，目前栈里面有 [bar,foo]</li><li>执行bar，<code>console.log('bar')</code>入栈，目前栈里面有 [console.log('bar'),bar,foo]</li><li>执行<code>console.log('bar')</code>并出栈，目前栈里面有 [bar,foo]</li><li>bar执行完毕被弹出，目前栈里面有 [foo]</li><li>foo执行完毕被弹出，目前栈为空 []</li></ol><p>下面是copy过来的图，看起来更直观：
+<img src=https://cdn.steemitimages.com/DQmStyEA5rYjaWeGLRbpxuMAs6uY21nLS2n4xwbb2fEsKAY/image.png alt></p><p>回顾完上面的基础概念后，下面开始本文的主要内容。</p><h1 id=event-loop是什么-https-html-spec-whatwg-org-multipage-webappapis-html-event-loop><a href=https://html.spec.whatwg.org/multipage/webappapis.html#event-loop>Event Loop是什么？</a></h1><h4 id=先看whatag的定义>先看WHATAG的定义：</h4><blockquote><p>To coordinate events, user interaction, scripts, rendering, networking, and so forth, <a href=https://tc39.es/ecma262/#sec-agents>user agents</a> must use event loops as described in this section. Each agent has an associated event loop.
+An event loop has one or more task queues. A task queue is a set of tasks.</p></blockquote><p>翻译过来就是，为了协调事件、用户交互、脚本、渲染、网络等，<code>用户代理</code>必须使用这一小节描述的<code>事件循环</code>。每个<code>代理</code>都有一个关联的事件循环。一个事件循环具有一个或多个<code>任务队列</code>。任务队列是一组任务。关于任务队列后面会详细说。其中<a href=https://tc39.es/ecma262/#sec-agents>用户代理（user agents）</a>在ecma262中定义，感兴趣的可以点击上面链接查看详情。这里可以简单理解为一个包含执行上下文堆栈，一组作业队列，执行线程等这些东西的概念。</p><h3 id=再看mdn中-事件循环-的描述>再看MDN中“事件循环“的描述：</h3><p>之所以称之为事件循环，是因为它经常按照类似如下的方式来被实现：</p><pre><code>  while (queue.waitForMessage()) {
     queue.processNextMessage();
   }
   
-</code></pre>
-
-<p>并且还有&quot;<code>执行至完成</code>&quot;的特点：</p>
-
-<blockquote>
-<p>每一个消息完整地执行后，其它消息才会被执行。这为程序的分析提供了一些优秀的特性，包括：一个函数执行时，它永远不会被抢占，并且在其他代码运行之前完全运行（且可以修改此函数操作的数据）。这与C语言不同，例如，如果函数在线程中运行，它可能在任何位置被终止，然后在另一个线程中运行其他代码。这个模型的一个缺点在于当一个消息需要太长时间才能处理完毕时，Web应用就无法处理用户的交互，例如点击或滚动。浏览器用“程序需要过长时间运行”的对话框来缓解这个问题。一个很好的做法是缩短消息处理，并在可能的情况下将一个消息裁剪成多个消息。</p>
-</blockquote>
-
-<p><img src="https://cdn.steemitimages.com/DQmZi7BW4ughjDezLyNmLEEXDXybUG63Fc2vcN9gw4ThHqs/image.png" alt="" /></p>
-
-<p>综合各种“官方”的规范和来自“民间”的共识，我得出的结论是这样的：</p>
-
-<h4 id="事件循环就是不断读取和执行任务队列中任务的过程-任务队列中的任务可能包含同步任务和异步任务-并且一个任务执行的过程是不能被中断的"><code>事件循环就是不断读取和执行任务队列中任务的过程。任务队列中的任务可能包含同步任务和异步任务，并且一个任务执行的过程是不能被中断的。</code></h4>
-
-<p>有没有发现，说了半天其实真正的主角是<code>任务队列</code>, 别急😂，说好的各个击破。。。</p>
-
-<h1 id="任务队列-https-html-spec-whatwg-org-multipage-webappapis-html-task-queue"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#task-queue">任务队列</a></h1>
-
-<blockquote>
-<p>Per its source field, each task is defined as coming from a specific task source. For each event loop, every task source must be associated with a specific task queue.</p>
-
-<p>Each event loop has a currently running task, which is either a task or null. Initially, this is null. It is used to handle reentrancy.</p>
-
-<p>Each event loop has a microtask queue, which is a queue of microtasks, initially empty. A microtask is a colloquial way of referring to a task that was created via the queue a microtask algorithm.</p>
-
-<p>Each event loop has a performing a microtask checkpoint boolean, which is initially false. It is used to prevent reentrant invocation of the perform a microtask checkpoint algorithm.</p>
-
-<p>Each event loop has associated values event loop begin and event loop end, which are initially unset.</p>
-</blockquote>
-
-<p>又是一大串英文😂，规范中写得很详细，这里只引用了部分重要的概念。概括如下：</p>
-
-<ul>
-<li><p>每个任务来自特定任务源，对于每个事件循环，每个任务源都必须与特定任务队列相关联。</p></li>
-
-<li><p>每个事件循环有一个微任务队列，初始值为空。微任务属于任务的一种。</p></li>
-
-<li><p>每个事件循环都有一个微任务检查点布尔值，最初为false。它用于防止执行微任务检查点算法的重入调用。</p></li>
-
-<li><p>每个事件循环都具有事件循环开始和事件循环结束的关联值，这些最初未设置。</p></li>
-</ul>
-
-<h4 id="另外规范中提到需要注意的地方">另外规范中提到需要注意的地方：</h4>
-
-<p>⚠️ 任务队列是Sets(集合)，不是队列！！因为事件循环处理模型的第一步是从所选队列中获取第一个可运行任务，而不是使第一个任务出列（dequeue）。Sets在规范中的定义是没有相同item的有序list。这里顺便提一下，<a href="https://tc39.es/ecma262/#sec-jobs-and-job-queues">ECMA T39</a>规范中把任务叫做job，任务队列叫做 Job Queues。并且提到 &quot;A Job Queue is a FIFO queue of PendingJob records&quot;。也就是说ECMA把任务队列当成先进先出的<code>Queue</code>数据结构，WHATWG强调不是<code>Queue</code>，很多文章会直接把任务队列直接当作<code>队列</code>，这里需要注意下。</p>
-
-<p>⚠️ 任务源主要作用是用于区分逻辑上不同类型的任务，因为任务来源非常广泛，比如有的可能是来自点击，有的可能是ajax请求完成。</p>
-
-<h1 id="任务源-generic-task-sources-https-html-spec-whatwg-org-multipage-webappapis-html-generic-task-sources"><a href="https://html.spec.whatwg.org/multipage/webappapis.html#generic-task-sources">任务源 Generic task sources</a></h1>
-
-<ul>
-<li><p>DOM操作任务源：
-此任务源被用来相应dom操作，例如一个元素以非阻塞的方式插入文档。</p></li>
-
-<li><p>用户交互任务源：
-此任务源用于对用户交互作出反应，例如键盘或鼠标输入。响应用户操作的事件（例如click）必须使用task队列。</p></li>
-
-<li><p>网络任务源：
-网络任务源被用来响应网络活动。</p></li>
-
-<li><p>history traversal任务源：
-当调用history.back()等类似的api时，将任务插进task队列。</p></li>
-</ul>
-
-<p>任务源种类非常多，比如ajax的onload，鼠标click事件，基本上我们经常绑定的各种dom事件都是task任务源，还有数据库操作（IndexedDB ），需要注意的是setTimeout、setInterval、setImmediate也是task任务源。总结来说task任务源有这几种：</p>
-
-<ul>
-<li>setTimeout</li>
-<li>setInterval</li>
-<li>setImmediate</li>
-<li>I/O</li>
-<li>UI rendering</li>
-</ul>
-
-<h1 id="任务分类">任务分类</h1>
-
-<blockquote>
-<p>所有任务可以分成两种，一种是同步任务（synchronous），另一种是异步任务（asynchronous）。同步任务指的是，在<code>主线程</code>上排队执行的任务，只有前一个任务执行完毕，才能执行后一个任务；异步任务指的是，不进入主线程、而进入<code>&quot;任务队列&quot;</code>（task queue）的任务，只有&quot;任务队列&quot;通知主线程，某个异步任务可以执行了，该任务才会进入主线程执行。</p>
-</blockquote>
-
-<p>上面一段是来自阮一峰博客，文章写于2014年，虽然这么归类现在看也没错，但是需要修订一下😄。</p>
-
-<h4 id="任务一般可以分成两种-一种是同步任务-synchronous-另一种是异步任务-asynchronous-异步任务也可以分为两种-一种是宏任务-macrotask-另一种是微任务-microtask-宏任务包含同步任务和异步任务-微任务都是异步任务"><code>任务一般可以分成两种，一种是同步任务（synchronous），另一种是异步任务（asynchronous）。异步任务也可以分为两种，一种是宏任务（macrotask），另一种是微任务（microtask）。宏任务包含同步任务和异步任务，微任务都是异步任务。</code></h4>
-
-<p>在WHATWG的规范中并没有找到关于macrotask的定义，但是一般大家的共识是把task就当作macrotask，与之相对的是microtask。</p>
-
-<p>⚠️ ES6+和Node环境才出现微任务的概念，比如Promise和process.nextTick，在这之前只需要理解同步任务和异步任务就行了。</p>
-
-<h1 id="macrotask来源">macrotask来源：</h1>
-
-<p>script主代码，事件回调，XHR回调，定时器（setTimeout/setInterval/setImmediate），IO操作，UI render</p>
-
-<h1 id="microtask来源">microtask来源：</h1>
-
-<p>promise回调，MutationObserver，process.nextTick，Object.observe</p>
-
-<h1 id="任务执行顺序">任务执行顺序</h1>
-
-<p>基本需要的概念都有了，现在开始本文最重要的概念，macrotask和microtask执行顺序：</p>
-
-<ol>
-<li>script主代码被推入<code>执行栈</code>，执行其中的同步代码，遇到异步代码会依次将任务分类放入macrotask队列和microtask队列</li>
-<li>继续执行<code>执行栈</code>中的同步代码，此时事件队列中的事件将被忽略，直到堆栈为空</li>
-<li>检测macrotask队列是否有宏任务待执行，如果有则取出第一个放入<code>执行栈</code>执行，注意一次事件循环只能执行一个宏任务⚠️</li>
-<li>执行完宏任务，开始检测microtask队列是否有微任务待执行，如果有则取出第一个放入<code>执行栈</code>执行，然后再检测，如果还有再取出再执行，直到microtask队列为空</li>
-<li>如果有注册requestAnimationFrame，执行requestAnimationFrame，requestAnimationFrame属于渲染过程，并且总是在渲染之前执行</li>
-<li>执行渲染更新UI，这里注意渲染ui不是必须的，和浏览器策略，硬件约束等有关，不同浏览器可能会有不同表现</li>
-<li>重复上述步骤，直到两个任务队列都为空</li>
-</ol>
-
-<p>上面是任务队列基本执行过程，<code>执行栈</code>被标红了，因为最终队列中的任务都在Javascript主线程执行。更详细的过程中可能还会包含Web worker和requestIdleCallback。很多文章把requestAnimationFrame归类为macrotask，但是我并没有找到明确的出处。另外，requestAnimationFrame虽然属于异步任务但是不在任务队列中，我无法确定requestAnimationFrame是否属于macrotask，有知道的朋友欢迎来交流。</p>
-
-<h2 id="小知识">⚠️ 小知识</h2>
-
-<blockquote>
-<p>规范没有要求任何特定的模型来选择渲染时机。但是，如果浏览器试图达到60Hz的刷新率，那么渲染机会最多每秒60次（约1000/60≈16.7ms）发生。如果浏览器发现一个浏览器上下文不能够维持这个速度，它有可能降低到30次每秒，而不是偶尔丢帧。类似地，如果浏览上下文不可见，则用户代理可能决定将该页面降低到每秒4次渲染，甚至更少。</p>
-</blockquote>
-
-<p>上面是关于UI渲染更新规范中特别提到的。由于页面是一帧一帧绘制出来的，当每秒绘制的帧数（FPS）达到60时页面是非常流畅的，小于这个值时就会感觉到页面卡顿。每一帧的时间大概是1000/60≈16.7ms，也就是说如果浏览器在一帧的时间内（小于16.7ms的）事情没干完就会出现卡顿。因为JS引擎线程和GUI渲染线程是互斥的，JS引擎线程如果一直阻塞，GUI渲染线程就一直没机会工作。所以为了页面表现更流畅，就需要避免写可能阻塞JS引擎线程的代码。比如不要写执行时间可能过久的循环，不要有太多的microtask，因为不管有多少个microtask都会在一次循环中执行完，使用macrotask不会有阻塞的问题，因为宏任务总是每个循环只执行一个。</p>
-
-<h2 id="再来看开篇的问题">再来看开篇的问题：</h2>
-
-<pre><code>console.log('script start');
+</code></pre><p>并且还有&quot;<code>执行至完成</code>&quot;的特点：</p><blockquote><p>每一个消息完整地执行后，其它消息才会被执行。这为程序的分析提供了一些优秀的特性，包括：一个函数执行时，它永远不会被抢占，并且在其他代码运行之前完全运行（且可以修改此函数操作的数据）。这与C语言不同，例如，如果函数在线程中运行，它可能在任何位置被终止，然后在另一个线程中运行其他代码。这个模型的一个缺点在于当一个消息需要太长时间才能处理完毕时，Web应用就无法处理用户的交互，例如点击或滚动。浏览器用“程序需要过长时间运行”的对话框来缓解这个问题。一个很好的做法是缩短消息处理，并在可能的情况下将一个消息裁剪成多个消息。</p></blockquote><p><img src=https://cdn.steemitimages.com/DQmZi7BW4ughjDezLyNmLEEXDXybUG63Fc2vcN9gw4ThHqs/image.png alt></p><p>综合各种“官方”的规范和来自“民间”的共识，我得出的结论是这样的：</p><h4 id=事件循环就是不断读取和执行任务队列中任务的过程-任务队列中的任务可能包含同步任务和异步任务-并且一个任务执行的过程是不能被中断的><code>事件循环就是不断读取和执行任务队列中任务的过程。任务队列中的任务可能包含同步任务和异步任务，并且一个任务执行的过程是不能被中断的。</code></h4><p>有没有发现，说了半天其实真正的主角是<code>任务队列</code>, 别急😂，说好的各个击破。。。</p><h1 id=任务队列-https-html-spec-whatwg-org-multipage-webappapis-html-task-queue><a href=https://html.spec.whatwg.org/multipage/webappapis.html#task-queue>任务队列</a></h1><blockquote><p>Per its source field, each task is defined as coming from a specific task source. For each event loop, every task source must be associated with a specific task queue.</p><p>Each event loop has a currently running task, which is either a task or null. Initially, this is null. It is used to handle reentrancy.</p><p>Each event loop has a microtask queue, which is a queue of microtasks, initially empty. A microtask is a colloquial way of referring to a task that was created via the queue a microtask algorithm.</p><p>Each event loop has a performing a microtask checkpoint boolean, which is initially false. It is used to prevent reentrant invocation of the perform a microtask checkpoint algorithm.</p><p>Each event loop has associated values event loop begin and event loop end, which are initially unset.</p></blockquote><p>又是一大串英文😂，规范中写得很详细，这里只引用了部分重要的概念。概括如下：</p><ul><li><p>每个任务来自特定任务源，对于每个事件循环，每个任务源都必须与特定任务队列相关联。</p></li><li><p>每个事件循环有一个微任务队列，初始值为空。微任务属于任务的一种。</p></li><li><p>每个事件循环都有一个微任务检查点布尔值，最初为false。它用于防止执行微任务检查点算法的重入调用。</p></li><li><p>每个事件循环都具有事件循环开始和事件循环结束的关联值，这些最初未设置。</p></li></ul><h4 id=另外规范中提到需要注意的地方>另外规范中提到需要注意的地方：</h4><p>⚠️ 任务队列是Sets(集合)，不是队列！！因为事件循环处理模型的第一步是从所选队列中获取第一个可运行任务，而不是使第一个任务出列（dequeue）。Sets在规范中的定义是没有相同item的有序list。这里顺便提一下，<a href=https://tc39.es/ecma262/#sec-jobs-and-job-queues>ECMA T39</a>规范中把任务叫做job，任务队列叫做 Job Queues。并且提到 &quot;A Job Queue is a FIFO queue of PendingJob records&quot;。也就是说ECMA把任务队列当成先进先出的<code>Queue</code>数据结构，WHATWG强调不是<code>Queue</code>，很多文章会直接把任务队列直接当作<code>队列</code>，这里需要注意下。</p><p>⚠️ 任务源主要作用是用于区分逻辑上不同类型的任务，因为任务来源非常广泛，比如有的可能是来自点击，有的可能是ajax请求完成。</p><h1 id=任务源-generic-task-sources-https-html-spec-whatwg-org-multipage-webappapis-html-generic-task-sources><a href=https://html.spec.whatwg.org/multipage/webappapis.html#generic-task-sources>任务源 Generic task sources</a></h1><ul><li><p>DOM操作任务源：
+此任务源被用来相应dom操作，例如一个元素以非阻塞的方式插入文档。</p></li><li><p>用户交互任务源：
+此任务源用于对用户交互作出反应，例如键盘或鼠标输入。响应用户操作的事件（例如click）必须使用task队列。</p></li><li><p>网络任务源：
+网络任务源被用来响应网络活动。</p></li><li><p>history traversal任务源：
+当调用history.back()等类似的api时，将任务插进task队列。</p></li></ul><p>任务源种类非常多，比如ajax的onload，鼠标click事件，基本上我们经常绑定的各种dom事件都是task任务源，还有数据库操作（IndexedDB ），需要注意的是setTimeout、setInterval、setImmediate也是task任务源。总结来说task任务源有这几种：</p><ul><li>setTimeout</li><li>setInterval</li><li>setImmediate</li><li>I/O</li><li>UI rendering</li></ul><h1 id=任务分类>任务分类</h1><blockquote><p>所有任务可以分成两种，一种是同步任务（synchronous），另一种是异步任务（asynchronous）。同步任务指的是，在<code>主线程</code>上排队执行的任务，只有前一个任务执行完毕，才能执行后一个任务；异步任务指的是，不进入主线程、而进入<code>&quot;任务队列&quot;</code>（task queue）的任务，只有&quot;任务队列&quot;通知主线程，某个异步任务可以执行了，该任务才会进入主线程执行。</p></blockquote><p>上面一段是来自阮一峰博客，文章写于2014年，虽然这么归类现在看也没错，但是需要修订一下😄。</p><h4 id=任务一般可以分成两种-一种是同步任务-synchronous-另一种是异步任务-asynchronous-异步任务也可以分为两种-一种是宏任务-macrotask-另一种是微任务-microtask-宏任务包含同步任务和异步任务-微任务都是异步任务><code>任务一般可以分成两种，一种是同步任务（synchronous），另一种是异步任务（asynchronous）。异步任务也可以分为两种，一种是宏任务（macrotask），另一种是微任务（microtask）。宏任务包含同步任务和异步任务，微任务都是异步任务。</code></h4><p>在WHATWG的规范中并没有找到关于macrotask的定义，但是一般大家的共识是把task就当作macrotask，与之相对的是microtask。</p><p>⚠️ ES6+和Node环境才出现微任务的概念，比如Promise和process.nextTick，在这之前只需要理解同步任务和异步任务就行了。</p><h1 id=macrotask来源>macrotask来源：</h1><p>script主代码，事件回调，XHR回调，定时器（setTimeout/setInterval/setImmediate），IO操作，UI render</p><h1 id=microtask来源>microtask来源：</h1><p>promise回调，MutationObserver，process.nextTick，Object.observe</p><h1 id=任务执行顺序>任务执行顺序</h1><p>基本需要的概念都有了，现在开始本文最重要的概念，macrotask和microtask执行顺序：</p><ol><li>script主代码被推入<code>执行栈</code>，执行其中的同步代码，遇到异步代码会依次将任务分类放入macrotask队列和microtask队列</li><li>继续执行<code>执行栈</code>中的同步代码，此时事件队列中的事件将被忽略，直到堆栈为空</li><li>检测macrotask队列是否有宏任务待执行，如果有则取出第一个放入<code>执行栈</code>执行，注意一次事件循环只能执行一个宏任务⚠️</li><li>执行完宏任务，开始检测microtask队列是否有微任务待执行，如果有则取出第一个放入<code>执行栈</code>执行，然后再检测，如果还有再取出再执行，直到microtask队列为空</li><li>如果有注册requestAnimationFrame，执行requestAnimationFrame，requestAnimationFrame属于渲染过程，并且总是在渲染之前执行</li><li>执行渲染更新UI，这里注意渲染ui不是必须的，和浏览器策略，硬件约束等有关，不同浏览器可能会有不同表现</li><li>重复上述步骤，直到两个任务队列都为空</li></ol><p>上面是任务队列基本执行过程，<code>执行栈</code>被标红了，因为最终队列中的任务都在Javascript主线程执行。更详细的过程中可能还会包含Web worker和requestIdleCallback。很多文章把requestAnimationFrame归类为macrotask，但是我并没有找到明确的出处。另外，requestAnimationFrame虽然属于异步任务但是不在任务队列中，我无法确定requestAnimationFrame是否属于macrotask，有知道的朋友欢迎来交流。</p><h2 id=小知识>⚠️ 小知识</h2><blockquote><p>规范没有要求任何特定的模型来选择渲染时机。但是，如果浏览器试图达到60Hz的刷新率，那么渲染机会最多每秒60次（约1000/60≈16.7ms）发生。如果浏览器发现一个浏览器上下文不能够维持这个速度，它有可能降低到30次每秒，而不是偶尔丢帧。类似地，如果浏览上下文不可见，则用户代理可能决定将该页面降低到每秒4次渲染，甚至更少。</p></blockquote><p>上面是关于UI渲染更新规范中特别提到的。由于页面是一帧一帧绘制出来的，当每秒绘制的帧数（FPS）达到60时页面是非常流畅的，小于这个值时就会感觉到页面卡顿。每一帧的时间大概是1000/60≈16.7ms，也就是说如果浏览器在一帧的时间内（小于16.7ms的）事情没干完就会出现卡顿。因为JS引擎线程和GUI渲染线程是互斥的，JS引擎线程如果一直阻塞，GUI渲染线程就一直没机会工作。所以为了页面表现更流畅，就需要避免写可能阻塞JS引擎线程的代码。比如不要写执行时间可能过久的循环，不要有太多的microtask，因为不管有多少个microtask都会在一次循环中执行完，使用macrotask不会有阻塞的问题，因为宏任务总是每个循环只执行一个。</p><h2 id=再来看开篇的问题>再来看开篇的问题：</h2><pre><code>console.log('script start');
 
 setTimeout(function() {
   console.log('setTimeout');
@@ -356,29 +43,8 @@ Promise.resolve().then(function() {
 });
 
 console.log('script end');
-</code></pre>
-
-<p>先文字描述下执行过程：</p>
-
-<ol>
-<li>console.log('script start')属于同步代码，进入JS主线程<code>执行栈</code>后直接执行，输出结果<code>script start</code>。</li>
-<li>JS主线程遇到setTimeout，发现是异步代码并且是宏任务，把回调放进macrotask队列等待执行。</li>
-<li>JS主线程遇到Promise并且resolve了，将第一个Promise then回调放进microtask队列。</li>
-<li>console.log('script end')属于同步代码直接执行，输出结果<code>script end</code>。</li>
-<li>此时主线程执行栈为空，开始处理微任务队列，执行console.log('promise1')，输出<code>script promise1</code>，并且同时又链式调用then创造了一个微任务进入microtask队列。</li>
-<li>再次主线程执行栈为空，继续第5步，输出<code>script promise2</code>，直到microtask队列也为空。</li>
-<li>浏览器视情况而定决定是否刷新渲染ui。</li>
-<li>进入下一个循环，发现macrotask队列有任务，执行 console.log('setTimeout'); 输出<code>script setTimeout</code>。</li>
-</ol>
-
-<p>下面是copy过来的一张图，执行过程非常清晰：
-<img src="https://cdn.steemitimages.com/DQmWmZxQbUkx4w5u7jiydS5yGCxpYmf79Aj4JMcghnu7nHN/browser-deom1-excute-animate.gif" alt="browser-deom1-excute-animate.gif" /></p>
-
-<h1 id="再来看看vue-nexttick中的应用">再来看看Vue.$nextTick中的应用</h1>
-
-<p>先看Vue.js 2.5.17的实现：</p>
-
-<pre><code>import { noop } from 'shared/util'
+</code></pre><p>先文字描述下执行过程：</p><ol><li>console.log('script start')属于同步代码，进入JS主线程<code>执行栈</code>后直接执行，输出结果<code>script start</code>。</li><li>JS主线程遇到setTimeout，发现是异步代码并且是宏任务，把回调放进macrotask队列等待执行。</li><li>JS主线程遇到Promise并且resolve了，将第一个Promise then回调放进microtask队列。</li><li>console.log('script end')属于同步代码直接执行，输出结果<code>script end</code>。</li><li>此时主线程执行栈为空，开始处理微任务队列，执行console.log('promise1')，输出<code>script promise1</code>，并且同时又链式调用then创造了一个微任务进入microtask队列。</li><li>再次主线程执行栈为空，继续第5步，输出<code>script promise2</code>，直到microtask队列也为空。</li><li>浏览器视情况而定决定是否刷新渲染ui。</li><li>进入下一个循环，发现macrotask队列有任务，执行 console.log('setTimeout'); 输出<code>script setTimeout</code>。</li></ol><p>下面是copy过来的一张图，执行过程非常清晰：
+<img src=https://cdn.steemitimages.com/DQmWmZxQbUkx4w5u7jiydS5yGCxpYmf79Aj4JMcghnu7nHN/browser-deom1-excute-animate.gif alt=browser-deom1-excute-animate.gif></p><h1 id=再来看看vue-nexttick中的应用>再来看看Vue.$nextTick中的应用</h1><p>先看Vue.js 2.5.17的实现：</p><pre><code>import { noop } from 'shared/util'
 import { handleError } from './error'
 import { isIOS, isNative } from './env'
 
@@ -493,13 +159,7 @@ export function nextTick (cb?: Function, ctx?: Object) {
   }
 }	
 
-</code></pre>
-
-<p>Vue2.5对于 macrotask 的实现，优先检测是否支持原生setImmediate，这是一个高版本 IE 和 Edge 才支持的特性，不支持的话再去检测是否支持原生的 MessageChannel，如果也不支持的话就会降级为setTimeout 0；而对于 microtask 的实现，则检测浏览器是否原生支持 Promise，不支持的话直接  microTimerFunc = macroTimerFunc，也就是说Vue2.5是优先使用microtask来执行nextTick中的任务的。</p>
-
-<h3 id="再来看看vue-js-2-6版本的实现">再来看看Vue.js 2.6版本的实现：</h3>
-
-<pre><code>	
+</code></pre><p>Vue2.5对于 macrotask 的实现，优先检测是否支持原生setImmediate，这是一个高版本 IE 和 Edge 才支持的特性，不支持的话再去检测是否支持原生的 MessageChannel，如果也不支持的话就会降级为setTimeout 0；而对于 microtask 的实现，则检测浏览器是否原生支持 Promise，不支持的话直接 microTimerFunc = macroTimerFunc，也就是说Vue2.5是优先使用microtask来执行nextTick中的任务的。</p><h3 id=再来看看vue-js-2-6版本的实现>再来看看Vue.js 2.6版本的实现：</h3><pre><code>	
 if (typeof Promise !== 'undefined' &amp;&amp; isNative(Promise)) {
   const p = Promise.resolve()
   timerFunc = () =&gt; {
@@ -570,21 +230,7 @@ export function nextTick (cb?: Function, ctx?: Object) {
   }
 }
 
-</code></pre>
-
-<p>Vue2.6对于 macrotask 的实现，优先检测是否支持原生Promise，然后是检测是否支持MutationObserver，然后是setImmediate，最后都不支持就使用setTimeout。可以明显看出和2.5版本是相反的，也就是优先使用microtask来执行$nextTick里面的回调。</p>
-
-<p>Vue对于$nextTick的实现改动了很多的版本，据我所知 Vue.js 2.5版本之前使用的microtask优先，2.5版本修改成macrotask优先，2.6版本又切换回microtask，至于具体原因尤大大也有提到：</p>
-
-<blockquote>
-<p>在 2.5 当中我们引入了一个改动，使得当一个 v-on DOM 事件侦听器触发更新时，会使用 Macrotask 而不是 Microtask 来进行异步缓冲。这原本是为了修正一类浏览器的特殊边际情况导致的 bug 才引入的，但这个改动本身却导致了更多其它的问题。在 2.6 里面我们对于原本的边际情况找到了更简单的 fix，因此这个 Macrotask 的改动也就没有必要了。现在 nextTick 将会统一全部使用 Microtask。如果你对具体的细节感兴趣，可以看<a href="https://gist.github.com/yyx990803/d1a0eaac052654f93a1ccaab072076dd">这里</a>。</p>
-</blockquote>
-
-<h1 id="node中的event-loop">Node中的Event Loop：</h1>
-
-<p>当 Node.js 启动后，它会初始化事件轮询，每一个event loop都会包含按如下顺序六个循环阶段。</p>
-
-<pre><code>   ┌───────────────────────────┐
+</code></pre><p>Vue2.6对于 macrotask 的实现，优先检测是否支持原生Promise，然后是检测是否支持MutationObserver，然后是setImmediate，最后都不支持就使用setTimeout。可以明显看出和2.5版本是相反的，也就是优先使用microtask来执行$nextTick里面的回调。</p><p>Vue对于$nextTick的实现改动了很多的版本，据我所知 Vue.js 2.5版本之前使用的microtask优先，2.5版本修改成macrotask优先，2.6版本又切换回microtask，至于具体原因尤大大也有提到：</p><blockquote><p>在 2.5 当中我们引入了一个改动，使得当一个 v-on DOM 事件侦听器触发更新时，会使用 Macrotask 而不是 Microtask 来进行异步缓冲。这原本是为了修正一类浏览器的特殊边际情况导致的 bug 才引入的，但这个改动本身却导致了更多其它的问题。在 2.6 里面我们对于原本的边际情况找到了更简单的 fix，因此这个 Macrotask 的改动也就没有必要了。现在 nextTick 将会统一全部使用 Microtask。如果你对具体的细节感兴趣，可以看<a href=https://gist.github.com/yyx990803/d1a0eaac052654f93a1ccaab072076dd>这里</a>。</p></blockquote><h1 id=node中的event-loop>Node中的Event Loop：</h1><p>当 Node.js 启动后，它会初始化事件轮询，每一个event loop都会包含按如下顺序六个循环阶段。</p><pre><code>   ┌───────────────────────────┐
 ┌─&gt;│           timers          │
 │  └─────────────┬─────────────┘
 │  ┌─────────────┴─────────────┐
@@ -602,33 +248,7 @@ export function nextTick (cb?: Function, ctx?: Object) {
 │  ┌─────────────┴─────────────┐
 └──┤      close callbacks      │
    └───────────────────────────┘
-</code></pre>
-
-<ul>
-<li>timers : 这个阶段执行setTimeout(callback) 和 setInterval(callback)预定的callback</li>
-<li>I/O callbacks : 执行延迟到下一个循环迭代的 I/O 回调</li>
-<li>idle, prepare : 仅node内部使用</li>
-<li>poll : 检索新的 I/O 事件;执行与 I/O 相关的回调（几乎所有情况下，除了close事件的callbacks、被timers(定时器，setTimeout、setInterval等)设定的callbacks、setImmediate设定的callbacks之外的callbacks），适当的条件下node将阻塞在这里</li>
-<li>check : setImmediate() 回调函数在这里执行</li>
-<li>close callbacks : 一些准备关闭的回调函数，如：socket.on('close'，callback)</li>
-</ul>
-
-<p>在每次运行的事件循环之间，Node.js 检查它是否在等待任何异步 I/O 或计时器，如果没有的话就干净的关闭。</p>
-
-<p>⚠️<code>注意上面六个阶段都不包括 process.nextTick()</code></p>
-
-<h2 id="setimmediate-对比-settimeout">setImmediate() 对比 setTimeout()</h2>
-
-<p>setImmediate() 和 setTimeout() 很类似，但何时调用行为完全不同。</p>
-
-<ul>
-<li>setImmediate：在当前轮询阶段完成后执行脚本，也就是在poll阶段完成时执行，即check阶段</li>
-<li>setTimeout：在毫秒的最小阈值经过后运行的脚本，timer阶段执行</li>
-</ul>
-
-<p>执行计时器的顺序将根据调用它们的上下文而异。如果二者都从主模块内调用，则计时将受进程性能的约束（这可能会受到计算机上运行的其它应用程序的影响）。</p>
-
-<pre><code>setTimeout(() =&gt; {
+</code></pre><ul><li>timers : 这个阶段执行setTimeout(callback) 和 setInterval(callback)预定的callback</li><li>I/O callbacks : 执行延迟到下一个循环迭代的 I/O 回调</li><li>idle, prepare : 仅node内部使用</li><li>poll : 检索新的 I/O 事件;执行与 I/O 相关的回调（几乎所有情况下，除了close事件的callbacks、被timers(定时器，setTimeout、setInterval等)设定的callbacks、setImmediate设定的callbacks之外的callbacks），适当的条件下node将阻塞在这里</li><li>check : setImmediate() 回调函数在这里执行</li><li>close callbacks : 一些准备关闭的回调函数，如：socket.on('close'，callback)</li></ul><p>在每次运行的事件循环之间，Node.js 检查它是否在等待任何异步 I/O 或计时器，如果没有的话就干净的关闭。</p><p>⚠️<code>注意上面六个阶段都不包括 process.nextTick()</code></p><h2 id=setimmediate-对比-settimeout>setImmediate() 对比 setTimeout()</h2><p>setImmediate() 和 setTimeout() 很类似，但何时调用行为完全不同。</p><ul><li>setImmediate：在当前轮询阶段完成后执行脚本，也就是在poll阶段完成时执行，即check阶段</li><li>setTimeout：在毫秒的最小阈值经过后运行的脚本，timer阶段执行</li></ul><p>执行计时器的顺序将根据调用它们的上下文而异。如果二者都从主模块内调用，则计时将受进程性能的约束（这可能会受到计算机上运行的其它应用程序的影响）。</p><pre><code>setTimeout(() =&gt; {
   console.log('timeout');
 }, 0);
 
@@ -636,11 +256,7 @@ setImmediate(() =&gt; {
   console.log('immediate');
 });
 
-</code></pre>
-
-<p>上面的例子在不属于I/O周期调用时，执行的先后顺序时<code>不确定的</code>，我把setTimeout的时间改为1ms后结果也是不确定的，这是因为Node做不到0毫秒，最少也需要1毫秒，可以理解成setTimeout(cb, 0) === setTimeout(cb, 1)，<a href="https://nodejs.org/api/timers.html#timers_settimeout_callback_delay_args">官方文档</a>中有说明。改成2ms后setImmediate总是先执行。关于执行顺序的先后问题在<a href="https://cnodejs.org/topic/57d68794cb6f605d360105bf">这里</a>有大佬通过源码详细讲解。</p>
-
-<pre><code>// timeout_vs_immediate.js
+</code></pre><p>上面的例子在不属于I/O周期调用时，执行的先后顺序时<code>不确定的</code>，我把setTimeout的时间改为1ms后结果也是不确定的，这是因为Node做不到0毫秒，最少也需要1毫秒，可以理解成setTimeout(cb, 0) === setTimeout(cb, 1)，<a href=https://nodejs.org/api/timers.html#timers_settimeout_callback_delay_args>官方文档</a>中有说明。改成2ms后setImmediate总是先执行。关于执行顺序的先后问题在<a href=https://cnodejs.org/topic/57d68794cb6f605d360105bf>这里</a>有大佬通过源码详细讲解。</p><pre><code>// timeout_vs_immediate.js
 const fs = require('fs');
 
 fs.readFile(__filename, () =&gt; {
@@ -653,18 +269,7 @@ fs.readFile(__filename, () =&gt; {
 });
 
 
-</code></pre>
-
-<p>但是，如果你把这两个函数放入一个 I/O 回调内部，setImmediate 总是被<code>优先调用</code>。</p>
-
-<h2 id="process-nexttick-对比-setimmediate">process.nextTick() 对比 setImmediate()</h2>
-
-<ul>
-<li>process.nextTick不在event loop的任何阶段执行，而是在各个阶段切换的中间执行,即从一个阶段切换到下个阶段前执行。</li>
-
-<li><p>setImmediate在下一次迭代或事件循环的“tick”时触发</p>
-
-<pre><code>setTimeout(() =&gt; {
+</code></pre><p>但是，如果你把这两个函数放入一个 I/O 回调内部，setImmediate 总是被<code>优先调用</code>。</p><h2 id=process-nexttick-对比-setimmediate>process.nextTick() 对比 setImmediate()</h2><ul><li>process.nextTick不在event loop的任何阶段执行，而是在各个阶段切换的中间执行,即从一个阶段切换到下个阶段前执行。</li><li><p>setImmediate在下一次迭代或事件循环的“tick”时触发</p><pre><code>setTimeout(() =&gt; {
  console.log('setTimeout');
 	 process.nextTick(()=&gt;{
 	   console.log('nextTick3');
@@ -684,16 +289,7 @@ process.nextTick(()=&gt;{
 })
 
 
-</code></pre></li>
-</ul>
-
-<p>执行结果是nextTick1，nextTick2，setTimeout，nextTick3，setImmediate，nextTick4</p>
-
-<p>可以看到<code>nextTick</code>其实是“名不副实”，它根本和next没毛线关系，但是由于npm包数量太大贸然改名会造成影响。官方建议开发者在所有情况下都使用setImmediate，因为setImmediate更容易理解并且有更广泛的兼容性，比如被浏览器所兼容。</p>
-
-<h1 id="最后来个小菜">最后来个小菜🍖</h1>
-
-<pre><code>console.log('Start')
+</code></pre></li></ul><p>执行结果是nextTick1，nextTick2，setTimeout，nextTick3，setImmediate，nextTick4</p><p>可以看到<code>nextTick</code>其实是“名不副实”，它根本和next没毛线关系，但是由于npm包数量太大贸然改名会造成影响。官方建议开发者在所有情况下都使用setImmediate，因为setImmediate更容易理解并且有更广泛的兼容性，比如被浏览器所兼容。</p><h1 id=最后来个小菜>最后来个小菜🍖</h1><pre><code>console.log('Start')
 
 setTimeout(() =&gt; console.log('Timeout 1'), 0)
 setTimeout(() =&gt; console.log('Timeout 2'), 0)
@@ -708,11 +304,7 @@ console.log('End');
 
 
 
-</code></pre>
-
-<h1 id="最最后的变态甜点">最最后的变态甜点🍮</h1>
-
-<pre><code>let button = document.querySelector('#button');
+</code></pre><h1 id=最最后的变态甜点>最最后的变态甜点🍮</h1><pre><code>let button = document.querySelector('#button');
 
 button.addEventListener('click', function CB1() {
   console.log('Listener 1');
@@ -730,151 +322,6 @@ button.addEventListener('click', function CB1() {
   Promise.resolve().then(() =&gt; console.log('Promise 2'))
 });
 
-</code></pre>
-
-<p>如果这个两个问题你都能人肉parse在脑中得出正确结果，那说明你真的懂了。否则，再重新多看几遍，下面的参考资料值得都看一遍。</p>
-
-<p>不懂不写，就酱。</p>
-
-<h1 id="后记">后记</h1>
-
-<hr />
-
-<p>由于JavaScript异步机制涉及内容太多，给我的感觉就是越写需要研究的东西越多，我会在适当时机更新，如有大佬发现有误的地方欢迎交流。</p>
-
-<p>参考资料：</p>
-
-<hr />
-
-<ul>
-<li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop">WHATWG官方event-loop规范</a></li>
-<li><a href="https://tc39.es/ecma262/#sec-jobs-and-job-queues">ecma262 sec-jobs-and-job-queues</a></li>
-<li><a href="https://tc39.es/ecma262/#sec-agents">ECMA262中Agent的定义</a></li>
-<li><a href="https://imweb.io/topic/58e3bfa845e5c13468f567d5">浏览器进程？线程？傻傻分不清楚！</a></li>
-<li><a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/">tasks-microtasks-queues-and-schedules</a></li>
-<li><a href="https://github.com/aooy/blog/issues/5">从event loop规范探究javaScript异步及浏览器更新渲染时机</a></li>
-<li><a href="http://lynnelv.github.io/js-event-loop-browser">深入理解js事件循环机制（浏览器篇）</a></li>
-<li><a href="http://www.ruanyifeng.com/blog/2014/10/event-loop.html">JavaScript 运行机制详解：再谈Event Loop</a></li>
-<li><a href="https://whatwg-cn.github.io/html/multipage/webappapis.html#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF">event-loop规范翻译</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/45111890">深入浏览器的事件循环 (GDD@2018)</a></li>
-<li><a href="https://gist.github.com/yyx990803/d1a0eaac052654f93a1ccaab072076dd">Vue 2.6 Reverting nextTick to Always Use Microtask</a></li>
-<li><a href="https://juejin.im/post/5c4041805188252420629086#heading-0">模拟实现 JS 引擎：深入了解 JS机制 以及 Microtask and Macrotask</a></li>
-<li><a href="https://juejin.im/post/5cd9854b5188252035420a13">你真的理解$nextTick么</a></li>
-<li><a href="https://juejin.im/post/5c337ae06fb9a049bc4cd218">Node的事件循环</a></li>
-<li><a href="https://www.404forest.com/2017/07/18/how-javascript-actually-works-eventloop-and-uirendering/">深入探究 eventloop 与浏览器渲染的时序问题</a></li>
-<li><a href="https://cnodejs.org/topic/57d68794cb6f605d360105bf">Node.js Event Loop 的理解 Timers，process.nextTick()</a></li>
-</ul>
-</div>
-        <div class="post_footer">
-          
-          <div class="meta">
-            <div class="info">
-              <span class="field tags">
-                <i class="remixicon-stack-line"></i>
-                
-                <a href="https://kai.ge/tags/javascript/">javaScript</a>
-                
-              </span>
-            </div>
-          </div>
-          
-        </div>
-      </div>
-      
-      
-      
-<div class="doc_comments">
-	<div id="gitalk-container"></div>
-</div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-
-<script type="text/javascript">
-let gitalk = new Gitalk({
-  clientID: '9c198be155c7caafd8b8',
-  clientSecret: 'e50131240f0cf6e73848e160726d174ab8a038a0',
-  repo: 'kai.ge',
-  owner: 'udbmnm',
-  admin: ['udbmnm'],
-  id: '2019-08-22 20:19:23 \x2b0800 CST',      
-  distractionFreeMode: false,  
-  title : '不懂不写系列：JavaScript的异步机制，EventLoop，macrotask，microtask，nextTick终结篇',
-  labels : []
-});
-gitalk.render('gitalk-container')
-</script>
-
-      
-    </div>
-  </div>
-  <a id="back_to_top" href="#" class="back_to_top"><span>△</span></a>
-</div>
-<footer class="footer">
-	<div class="powered_by">
-		<a href="http://www.gohugo.io/" target="_blank">Proudly published with Hugo. </a>
-		<a href="https://github.com/zhoukai0620/hugo-theme-zozo" target="_blank">Designed by Zeuk</a>
-		<a href="http://www.beian.miit.gov.cn" target="_blank">粤ICP备16043072号-1</a>
-	</div>
-
-</footer>
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "https://hm.baidu.com/hm.js?b133881eb41db2b2c6030a4257c40dcc";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
-
-
-<script src="https://kai.ge/js/jquery-3.3.1.min.js"></script>
-<script src="https://kai.ge/js/zozo.js"></script>
-<script src="https://kai.ge/js/highlight.pack.js"></script>
-<link  href="https://kai.ge/css/fancybox.min.css" rel="stylesheet">
-<script src="https://kai.ge/js/fancybox.min.js"></script>
-
-<script>hljs.initHighlightingOnLoad()</script>
-
-
-  <script type="text/javascript" async src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-MathJax.Hub.Config({
-  tex2jax: {
-    inlineMath: [['$','$'], ['\\(','\\)']],
-    displayMath: [['$$','$$'], ['\[\[','\]\]']],
-    processEscapes: true,
-    processEnvironments: true,
-    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-    TeX: { equationNumbers: { autoNumber: "AMS" },
-         extensions: ["AMSmath.js", "AMSsymbols.js"] }
-  }
-});
-
-MathJax.Hub.Queue(function() {
-    
-    
-    
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i = 0; i < all.length; i += 1) {
-        all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-});
-</script>
-
-<style>
-code.has-jax {
-    font: inherit;
-    font-size: 100%;
-    background: inherit;
-    border: inherit;
-    color: #515151;
-}
-</style>
-
-
-
-
-
-
-</body>
-</html>
+</code></pre><p>如果这个两个问题你都能人肉parse在脑中得出正确结果，那说明你真的懂了。否则，再重新多看几遍，下面的参考资料值得都看一遍。</p><p>不懂不写，就酱。</p><h1 id=后记>后记</h1><hr><p>由于JavaScript异步机制涉及内容太多，给我的感觉就是越写需要研究的东西越多，我会在适当时机更新，如有大佬发现有误的地方欢迎交流。</p><p>参考资料：</p><hr><ul><li><a href=https://html.spec.whatwg.org/multipage/webappapis.html#event-loop>WHATWG官方event-loop规范</a></li><li><a href=https://tc39.es/ecma262/#sec-jobs-and-job-queues>ecma262 sec-jobs-and-job-queues</a></li><li><a href=https://tc39.es/ecma262/#sec-agents>ECMA262中Agent的定义</a></li><li><a href=https://imweb.io/topic/58e3bfa845e5c13468f567d5>浏览器进程？线程？傻傻分不清楚！</a></li><li><a href=https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/>tasks-microtasks-queues-and-schedules</a></li><li><a href=https://github.com/aooy/blog/issues/5>从event loop规范探究javaScript异步及浏览器更新渲染时机</a></li><li><a href=http://lynnelv.github.io/js-event-loop-browser>深入理解js事件循环机制（浏览器篇）</a></li><li><a href=http://www.ruanyifeng.com/blog/2014/10/event-loop.html>JavaScript 运行机制详解：再谈Event Loop</a></li><li><a href=https://whatwg-cn.github.io/html/multipage/webappapis.html#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF>event-loop规范翻译</a></li><li><a href=https://zhuanlan.zhihu.com/p/45111890>深入浏览器的事件循环 (GDD@2018)</a></li><li><a href=https://gist.github.com/yyx990803/d1a0eaac052654f93a1ccaab072076dd>Vue 2.6 Reverting nextTick to Always Use Microtask</a></li><li><a href=https://juejin.im/post/5c4041805188252420629086#heading-0>模拟实现 JS 引擎：深入了解 JS机制 以及 Microtask and Macrotask</a></li><li><a href=https://juejin.im/post/5cd9854b5188252035420a13>你真的理解$nextTick么</a></li><li><a href=https://juejin.im/post/5c337ae06fb9a049bc4cd218>Node的事件循环</a></li><li><a href=https://www.404forest.com/2017/07/18/how-javascript-actually-works-eventloop-and-uirendering/>深入探究 eventloop 与浏览器渲染的时序问题</a></li><li><a href=https://cnodejs.org/topic/57d68794cb6f605d360105bf>Node.js Event Loop 的理解 Timers，process.nextTick()</a></li></ul></div><div class=post_footer><div class=meta><div class=info><span class="field tags"><i class=remixicon-stack-line></i><a href=https://kai.ge/tags/javascript/>javaScript</a></span></div></div></div></div><div class=doc_comments><div id=gitalk-container></div></div><link rel=stylesheet href=https://unpkg.com/gitalk/dist/gitalk.css><script src=https://unpkg.com/gitalk/dist/gitalk.min.js></script><script type=text/javascript>let gitalk=new Gitalk({clientID:'9c198be155c7caafd8b8',clientSecret:'e50131240f0cf6e73848e160726d174ab8a038a0',repo:'kai.ge',owner:'udbmnm',admin:['udbmnm'],id:'2019-08-22 20:19:23 \x2b0800 CST',distractionFreeMode:false,title:'不懂不写系列：JavaScript的异步机制，EventLoop，macrotask，microtask，nextTick终结篇',labels:[]});gitalk.render('gitalk-container')</script></div></div><a id=back_to_top href=# class=back_to_top><span>△</span></a></div><footer class=footer><div class=powered_by><a href=http://www.gohugo.io/ target=_blank>Proudly published with Hugo.</a>
+<a href=https://github.com/zhoukai0620/hugo-theme-zozo target=_blank>Designed by Zeuk</a>
+<a href=http://www.beian.miit.gov.cn target=_blank>粤ICP备16043072号-1</a></div></footer><script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?b133881eb41db2b2c6030a4257c40dcc";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();</script><script src=https://kai.ge/js/jquery-3.3.1.min.js></script><script src=https://kai.ge/js/zozo.js></script><script src=https://kai.ge/js/highlight.pack.js></script><link href=https://kai.ge/css/fancybox.min.css rel=stylesheet><script src=https://kai.ge/js/fancybox.min.js></script><script>hljs.initHighlightingOnLoad()</script><script type=text/javascript async src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">MathJax.Hub.Config({tex2jax:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\[\[','\]\]']],processEscapes:true,processEnvironments:true,skipTags:['script','noscript','style','textarea','pre'],TeX:{equationNumbers:{autoNumber:"AMS"},extensions:["AMSmath.js","AMSsymbols.js"]}}});MathJax.Hub.Queue(function(){var all=MathJax.Hub.getAllJax(),i;for(i=0;i<all.length;i+=1){all[i].SourceElement().parentNode.className+=' has-jax';}});</script><style>code.has-jax{font:inherit;font-size:100%;background:inherit;border:inherit;color:#515151}</style></body></html>
