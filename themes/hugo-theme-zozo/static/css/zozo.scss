@@ -592,7 +592,9 @@ a.back_to_top {
     }
   }
 }
-
+.gt-container .gt-comments {
+    padding-bottom: 1.25em;
+}
 @media print, screen and (max-width: 680px) {
   .nav_container {
     position: relative;
