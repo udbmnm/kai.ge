@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-cn" >
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  
+  <meta name="author"
+        content="凯哥"/>
+
+  
+  <meta name="description" content="前几天闲的没事，去sosobtc的聊天室看了看，我发现那些人一天到晚乐此不疲的发些没用的消息。不是说哪个涨了多少跌了多少，就是问某某还能不能进，某某该不该卖了，买什么赚了多少倍，骂李笑来大骗子种种。。"/>
+  
+
+  
+  
+  <meta name="keywords" content="kai.ge, 凯哥博客, blog, hugo"/>
+  
+
+  
+  <link rel="canonical" href="https://kai.ge/posts/%E7%94%A8python%E5%88%86%E6%9E%90%E8%99%9A%E6%8B%9F%E5%B8%81%E8%81%8A%E5%A4%A9%E5%AE%A4%E9%9F%AD%E8%8F%9C%E5%BF%83%E7%90%86/"/>
+
+  
+
+  <title>用Python分析虚拟币聊天室韭菜心理 &middot; 凯哥的个人网站</title>
+
+  <link rel="shortcut icon" href="https://kai.ge/images/favicon.ico"/>
+  <link rel="stylesheet" href="https://kai.ge/css/animate.min.css"/>
+  <link rel="stylesheet" href="https://kai.ge/css/remixicon.css"/>
+  <link rel="stylesheet" href="https://kai.ge/css/zozo.css"/>
+  <link rel="stylesheet" href="https://kai.ge/css/highlight.css"/>
+
+  
+  
+</head>
+
+<body>
+<div class="main animated">
+  <div class="nav_container animated fadeInDown">
+  <div class="site_nav" id="site_nav">
+    <ul>
+      
+      <li>
+        <a href="/">首页</a>
+      </li>
+      
+      <li>
+        <a href="/posts/">归档</a>
+      </li>
+      
+      <li>
+        <a href="/tags/">标签</a>
+      </li>
+      
+      <li>
+        <a href="/books">读书</a>
+      </li>
+      
+      <li>
+        <a href="/fav">好站</a>
+      </li>
+      
+      <li>
+        <a href="/about/">关于</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="menu_icon">
+    <a id="menu_icon"><i class="remixicon-links-line"></i></a>
+  </div>
+</div>
+
+  <div class="header animated fadeInDown">
+  <div class="site_title_container">
+    <div class="site_title">
+      <h1>
+        <a href="https://kai.ge">
+          <span>凯哥的个人网站</span>
+          <img src="https://kai.ge/images/logo.svg"/>
+        </a>
+      </h1>
+    </div>
+    <div class="description">
+      <p class="sub_title">kai.ge</p>
+      <div class="my_socials">
+        
+        
+        <a href="https://github.com/udbmnm" title="github" target="_blank"><i class="remixicon-github-fill"></i></a>
+        
+        
+        
+        <a href="https://twitter.com/udbmnm" title="twitter" target="_blank"><i class="remixicon-twitter-fill"></i></a>
+        
+        
+        <a href="https://kai.ge/index.xml" type="application/rss+xml" title="rss" target="_blank"><i class="remixicon-rss-fill"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="post_page">
+      <div class="post animated fadeInDown">
+        <div class="post_title post_detail_title">
+          <h2><a href='/posts/%E7%94%A8python%E5%88%86%E6%9E%90%E8%99%9A%E6%8B%9F%E5%B8%81%E8%81%8A%E5%A4%A9%E5%AE%A4%E9%9F%AD%E8%8F%9C%E5%BF%83%E7%90%86/'>用Python分析虚拟币聊天室韭菜心理</a></h2>
+          <span class="date">2017.08.19</span>
+        </div>
+        <div class="post_content markdown"><p>前几天闲的没事，去sosobtc的聊天室看了看，我发现那些人一天到晚乐此不疲的发些没用的消息。不是说哪个涨了多少跌了多少，就是问某某还能不能进，某某该不该卖了，买什么赚了多少倍，骂李笑来大骗子种种。。基本上可以看出韭菜们的贪婪恐惧和无知，和各种股票群里的对话差不多。</p>
+
+<p>我突发奇想，想分析下那些虚拟币交易的韭菜们到底一天到晚再聊些什么。于是写了个程序抓取聊天室的聊天记录，然后保存到mysql，然后用Python做了下词云分析。</p>
+
+<p>下面是词云的效果：</p>
+
+<p><img src="http://ww1.sinaimg.cn/large/694a5846gy1fip5lctjrcj211y0iogr4.jpg" alt="" /></p>
+
+<p><img src="http://ww1.sinaimg.cn/large/694a5846gy1fip5leznsnj210z0g5n2k.jpg" alt="" /></p>
+
+<p>应该是当天蚂蚁大涨，所以频率比较高，可以看出韭菜们对消息和市场的反应。。。</p>
+
+<p>准备工作：</p>
+
+<p>首先准备好几个准备抓取得聊天室的地址，我准备的几个地址如下：</p>
+
+<p><a href="http://io.sosobtc.com/?chnl=okcoin&amp;theme=light&amp;nested=true&amp;app=true">http://io.sosobtc.com/?chnl=okcoin&amp;theme=light&amp;nested=true&amp;app=true</a></p>
+
+<p><a href="https://io.sosobtc.com/?chnl=yunbi&amp;theme=light&amp;nested=false&amp;app=true">https://io.sosobtc.com/?chnl=yunbi&amp;theme=light&amp;nested=false&amp;app=true</a></p>
+
+<p><a href="https://io.sosobtc.com/?chnl=biter&amp;theme=light&amp;nested=true&amp;app=true">https://io.sosobtc.com/?chnl=biter&amp;theme=light&amp;nested=true&amp;app=true</a></p>
+
+<p><a href="https://io.sosobtc.com/?chnl=jubi&amp;theme=light&amp;nested=true&amp;app=true">https://io.sosobtc.com/?chnl=jubi&amp;theme=light&amp;nested=true&amp;app=true</a></p>
+
+<p>可以很清楚的看到chnl就是不同的交易所，sosobtc支持很多个交易所，感兴趣的可以自己改参数试试</p>
+
+<p>由于sosobtc的聊天室是基于websocket的，所以只需要在接收信息的地方拦截消息然后发送到本地后端保存就行了</p>
+
+<p>这里我们使用Fiddle代理<a href="http://io.sosobtc.com/public/javascripts/app.js">http://io.sosobtc.com/public/javascripts/app.js</a> 这个js文件</p>
+
+<p>然后找到</p>
+
+<pre><code>client.on('data', function onReply(data) {
+    receive(data);
+});
+</code></pre>
+
+<p>可以看到这里调用receive方法来处理数据，于是在receive里面动动手脚就行啦。</p>
+
+<p><img src="http://ww1.sinaimg.cn/large/694a5846gy1fip5y6jmfbj20u30ekmza.jpg" alt="" /></p>
+
+<p>可以看到我这里每次就是到消息就发送一个POST到本地<a href="http://localhost/msg，这样抓取数据就写好了">http://localhost/msg，这样抓取数据就写好了</a></p>
+
+<p>localhost里面的代码就很简单了，保存post到mysql，最后是Python的词云分析。</p>
+
+<p>这一步也很简单，才几行代码，哈哈哈。。。</p>
+
+<p><img src="http://ww1.sinaimg.cn/large/694a5846gy1fip5y6ztxbj20uv0ar0tm.jpg" alt="" /></p>
+
+<p>这里需要注意如果你的文本是中文需要引入支持中文的字体，我这里引入的微软自带的字体</p>
+
+<p>就酱吧，有兴趣的可以研究研究，PY可以干很多好玩的事。</p>
+
+<p>PS:</p>
+
+<p>这里是我搜集的2w多条数据，可以下载自己跑的试试</p>
+
+<p><a href="https://www.dropbox.com/s/gebl89uopm0103l/msg2.txt?dl=0">https://www.dropbox.com/s/gebl89uopm0103l/msg2.txt?dl=0</a></p>
+
+<p>链接: <a href="https://pan.baidu.com/s/1ejGkcVEW8IiZGwgsE2u5Bg">https://pan.baidu.com/s/1ejGkcVEW8IiZGwgsE2u5Bg</a> 提取码: 5rr8</p>
+</div>
+        <div class="post_footer">
+          
+          <div class="meta">
+            <div class="info">
+              <span class="field tags">
+                <i class="remixicon-stack-line"></i>
+                
+                <a href="https://kai.ge/tags/btc/">BTC</a>
+                
+                <a href="https://kai.ge/tags/python/">python</a>
+                
+              </span>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+      
+      
+<div class="doc_comments">
+	<div id="gitalk-container"></div>
+</div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<script type="text/javascript">
+let gitalk = new Gitalk({
+  clientID: '9c198be155c7caafd8b8',
+  clientSecret: 'e50131240f0cf6e73848e160726d174ab8a038a0',
+  repo: 'kai.ge',
+  owner: 'udbmnm',
+  admin: ['udbmnm'],
+  id: '2017-08-19 09:24:12 \x2b0800 CST',      
+  distractionFreeMode: false,  
+  title : '用Python分析虚拟币聊天室韭菜心理',
+  labels : []
+});
+gitalk.render('gitalk-container')
+</script>
+
+      
+    </div>
+  </div>
+  <a id="back_to_top" href="#" class="back_to_top"><span>△</span></a>
+</div>
+<footer class="footer">
+	<div class="powered_by">
+		<a href="http://www.gohugo.io/" target="_blank">Proudly published with Hugo. </a>
+		<a href="https://github.com/zhoukai0620/hugo-theme-zozo" target="_blank">Designed by Zeuk</a>
+		<a href="http://www.beian.miit.gov.cn" target="_blank">粤ICP备16043072号-1</a>
+	</div>
+
+</footer>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?b133881eb41db2b2c6030a4257c40dcc";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script src="https://kai.ge/js/jquery-3.3.1.min.js"></script>
+<script src="https://kai.ge/js/zozo.js"></script>
+<script src="https://kai.ge/js/highlight.pack.js"></script>
+<link  href="https://kai.ge/css/fancybox.min.css" rel="stylesheet">
+<script src="https://kai.ge/js/fancybox.min.js"></script>
+
+<script>hljs.initHighlightingOnLoad()</script>
+
+
+  <script type="text/javascript" async src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+
+
+
+
+
+
+</body>
+</html>
