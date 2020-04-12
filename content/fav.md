@@ -4,6 +4,7 @@ date: 2019-10-31T17:03:25+08:00
 tags: ["网站"]
 ---
 
+## #工具
 [字由 - 最好用的字体管理利器](https://www.hellofont.cn/)
 
 [找到AI - 找到你喜爱的作品](https://zhaodao.ai/)
@@ -39,3 +40,26 @@ tags: ["网站"]
 [dogedoge - 谷歌搜索替代方案](https://www.dogedoge.com/)
 
 [uTools - 你的生产力工具集](https://u.tools/)
+
+
+## #编程技术
+[javascript 算法](https://github.com/trekhleb/javascript-algorithms/blob/master/README.zh-CN.md)
+
+[如何正确的学习Node.js](https://i5ting.github.io/How-to-learn-node-correctly/)
+
+[Go Web 编程](https://github.com/astaxie/build-web-application-with-golang)
+
+[Vue.js 技术揭秘](https://ustbhuangyi.github.io/vue-analysis/v2/prepare/)
+
+[逐行剖析 Vue.js 源码](https://nlrx-wjc.github.io/Learn-Vue-Source-Code/)
+
+[CNode：Node.js专业中文社区](https://cnodejs.org/)
+
+[Laravel China 社区](https://learnku.com/laravel)
+
+## #博客
+[王垠](http://www.yinwang.org/)
+
+[酷 壳](http://coolshell.cn/)
+
+[汤姆大叔](https://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html)
