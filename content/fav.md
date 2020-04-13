@@ -43,11 +43,21 @@ tags: ["网站"]
 
 
 ## #编程技术
-[javascript 算法](https://github.com/trekhleb/javascript-algorithms/blob/master/README.zh-CN.md)
+[JavaScript 算法与数据结构](https://github.com/trekhleb/javascript-algorithms/blob/master/README.zh-CN.md)
 
 [如何正确的学习Node.js](https://i5ting.github.io/How-to-learn-node-correctly/)
 
+[JavaScript 秘密花园](http://bonsaiden.github.io/JavaScript-Garden/zh/)
+
+[Learn X in Y minutes](https://learnxinyminutes.com/)
+
+[Leetcode 题解](http://lucifer.ren/leetcode/)
+
 [Go Web 编程](https://github.com/astaxie/build-web-application-with-golang)
+
+[《The Way to Go》中文译本](https://github.com/unknwon/the-way-to-go_ZH_CN)
+
+[《Go语言高级编程》开源图书](https://github.com/chai2010/advanced-go-programming-book)
 
 [Vue.js 技术揭秘](https://ustbhuangyi.github.io/vue-analysis/v2/prepare/)
 
