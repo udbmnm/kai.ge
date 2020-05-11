@@ -4,8 +4,19 @@
   
   <url>
     <loc>https://kai.ge/posts/</loc>
-    <lastmod>2020-02-24T21:46:42+08:00</lastmod>
+    <lastmod>2020-05-11T19:04:09+08:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/</loc>
+    <lastmod>2020-05-11T19:04:09+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/posts/%E7%BA%AF%E6%89%8B%E5%B7%A5%E6%90%AD%E5%BB%BAelectron&#43;tsx%E8%84%9A%E6%89%8B%E6%9E%B6%E6%97%A0nodemon/</loc>
+    <lastmod>2020-05-11T19:04:09+08:00</lastmod>
   </url>
   
   <url>
@@ -16,12 +27,6 @@
   
   <url>
     <loc>https://kai.ge/tags/%E4%B9%A6/</loc>
-    <lastmod>2020-02-24T21:46:42+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://kai.ge/</loc>
     <lastmod>2020-02-24T21:46:42+08:00</lastmod>
     <priority>0</priority>
   </url>

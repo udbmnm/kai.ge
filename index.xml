@@ -6,10 +6,19 @@
     <description>Recent content on 凯哥的个人网站</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 24 Feb 2020 21:46:42 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2020 19:04:09 +0800</lastBuildDate>
     
 	<atom:link href="https://kai.ge/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>纯手工搭建Electron&#43;React&#43;Typescript脚手架，无nodemon无concurrently</title>
+      <link>https://kai.ge/posts/%E7%BA%AF%E6%89%8B%E5%B7%A5%E6%90%AD%E5%BB%BAelectron&#43;tsx%E8%84%9A%E6%89%8B%E6%9E%B6%E6%97%A0nodemon/</link>
+      <pubDate>Mon, 11 May 2020 19:04:09 +0800</pubDate>
+      
+      <guid>https://kai.ge/posts/%E7%BA%AF%E6%89%8B%E5%B7%A5%E6%90%AD%E5%BB%BAelectron&#43;tsx%E8%84%9A%E6%89%8B%E6%9E%B6%E6%97%A0nodemon/</guid>
+      <description>最近准备开发一个软件，本来准备用Chrome Extension来实现的，因为扩展可以无视跨域，基本上大部分需求都可以满足，为了解决自动更新的问题，最近还专门去研究了Chrome扩展实现热更新的机制，目</description>
+    </item>
     
     <item>
       <title>黑天鹅之年，重读《反脆弱》</title>

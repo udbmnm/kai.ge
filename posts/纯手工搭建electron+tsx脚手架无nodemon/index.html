@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-cn" >
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  
+  <meta name="author"
+        content="凯哥"/>
+
+  
+  <meta name="description" content="最近准备开发一个软件，本来准备用Chrome Extension来实现的，因为扩展可以无视跨域，基本上大部分需求都可以满足，为了解决自动更新的问题，最近还专门去研究了Chrome扩展实现热更新的机制，目"/>
+  
+
+  
+  
+  <meta name="keywords" content="kai.ge, 凯哥博客, blog, hugo"/>
+  
+
+  
+  <link rel="canonical" href="https://kai.ge/posts/%E7%BA%AF%E6%89%8B%E5%B7%A5%E6%90%AD%E5%BB%BAelectron&#43;tsx%E8%84%9A%E6%89%8B%E6%9E%B6%E6%97%A0nodemon/"/>
+
+  
+
+  <title>纯手工搭建Electron&#43;React&#43;Typescript脚手架，无nodemon无concurrently &middot; 凯哥的个人网站</title>
+
+  <link rel="shortcut icon" href="https://kai.ge/images/favicon.ico"/>
+  <link rel="stylesheet" href="https://kai.ge/css/animate.min.css"/>
+  <link rel="stylesheet" href="https://kai.ge/css/remixicon.css"/>
+  <link rel="stylesheet" href="https://kai.ge/css/zozo.css"/>
+  <link rel="stylesheet" href="https://kai.ge/css/highlight.css"/>
+
+  
+  
+</head>
+
+<body>
+<div class="main animated">
+  <div class="nav_container animated fadeInDown">
+  <div class="site_nav" id="site_nav">
+    <ul>
+      
+      <li>
+        <a href="/">首页</a>
+      </li>
+      
+      <li>
+        <a href="/posts/">归档</a>
+      </li>
+      
+      <li>
+        <a href="/tags/">标签</a>
+      </li>
+      
+      <li>
+        <a href="/books">读书</a>
+      </li>
+      
+      <li>
+        <a href="/fav">好站</a>
+      </li>
+      
+      <li>
+        <a href="/about/">关于</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="menu_icon">
+    <a id="menu_icon"><i class="remixicon-links-line"></i></a>
+  </div>
+</div>
+
+  <div class="header animated fadeInDown">
+  <div class="site_title_container">
+    <div class="site_title">
+      <h1>
+        <a href="https://kai.ge">
+          <span>凯哥的个人网站</span>
+          <img src="https://kai.ge/images/logo.svg"/>
+        </a>
+      </h1>
+    </div>
+    <div class="description">
+      <p class="sub_title">kai.ge</p>
+      <div class="my_socials">
+        
+        
+        <a href="https://github.com/udbmnm" title="github" target="_blank"><i class="remixicon-github-fill"></i></a>
+        
+        
+        
+        <a href="https://twitter.com/udbmnm" title="twitter" target="_blank"><i class="remixicon-twitter-fill"></i></a>
+        
+        
+        <a href="https://kai.ge/index.xml" type="application/rss+xml" title="rss" target="_blank"><i class="remixicon-rss-fill"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="post_page">
+      <div class="post animated fadeInDown">
+        <div class="post_title post_detail_title">
+          <h2><a href='/posts/%E7%BA%AF%E6%89%8B%E5%B7%A5%E6%90%AD%E5%BB%BAelectron&#43;tsx%E8%84%9A%E6%89%8B%E6%9E%B6%E6%97%A0nodemon/'>纯手工搭建Electron&#43;React&#43;Typescript脚手架，无nodemon无concurrently</a></h2>
+          <span class="date">2020.05.11</span>
+        </div>
+        <div class="post_content markdown"><p>最近准备开发一个软件，本来准备用Chrome Extension来实现的，因为扩展可以无视跨域，基本上大部分需求都可以满足，为了解决自动更新的问题，最近还专门去研究了Chrome扩展实现热更新的机制，目前百度的前端助手上已经实现了。</p>
+
+<p>前几年开发过一款微信QQ淘客机器人插件，这是我和朋友开发的一款商业化的软件，当时的竞争对手也都是插件形式，为了保持轻量级，我们也使用了Chrome扩展的形式，虽然想要的功能都完美实现了，但是相比于本地应用的能力还是差很多，走了不少弯路。有些实现方式比较hack，同时把发送微信群消息和QQ群消息集成在web上并不容易，并且由于扩展能力有限，会遇到很多坑，比如不能操作本地文件，自动更新升级麻烦，每次都得发商店审批，有的小白用户不会安装扩展等等。。。</p>
+
+<p>我觉得当时我们已经把扩展已有的能力用到了极致，如果当时一开始就选择基于Electron，我可以少熬多少夜啊。。。虽然之前很早就接触过node-webkit和Electron，但是一直没有开发过一个完整的应用，思前想后，对比来对比去，决定还是一把梭Electron算了，有一种弥补遗憾的感觉。什么问题都解决了，有本地功能，自动升级，双击就启动应用等等，好处多多，既可以学习Electron，又可以练习typescript，产品问题也可以解决，简直是一箭三雕。</p>
+
+<p>既然要用Typescript开发Electron，第一肯定得找一个称手的脚手架，我找了几个加星🌟比较多的项目，但是都不太喜欢，不是黑盒子就是没见过的依赖非常多。然后我搜索了一些教程然后准备自己手撸一个，这样出bug了也知道问题在哪里，不用去到处搜解决方案。</p>
+
+<p>下面是整个脚手架的流程图：</p>
+
+<p><img src="https://cdn.steemitimages.com/DQmRde9KGKozA6GYMeEzWYnFSbsoTceDrNDcufGtPUGF3bh/%E6%9C%AA%E5%91%BD%E5%90%8D%E6%96%87%E4%BB%B6%20(1).png" alt="Electron流程图" /></p>
+
+<p>我看开源的脚手架都用了nodemon来重启主进程，我觉得这里可以直接监听webpack中compiler的done事件，然后重启主进程，这样就可以省一个依赖模块，package.json已经够乱的了。至于concurrently主要是用来并行执行命令，我觉得其实也没太必要，我通过监听渲染进程开启devServer时的before事件开启编译主进程，这样又可以省一个包了😂</p>
+
+<p>我这里打包脚本又四个：</p>
+
+<ul>
+<li>webpack.common.js</li>
+<li>webpack.main.js</li>
+<li>webpack.prod.js</li>
+<li>webpack.renderer.js</li>
+</ul>
+
+<p>......</p>
+
+<p>......</p>
+
+<p>......</p>
+</div>
+        <div class="post_footer">
+          
+        </div>
+      </div>
+      
+      
+      
+<div class="doc_comments">
+	<div id="gitalk-container"></div>
+</div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<script type="text/javascript">
+let gitalk = new Gitalk({
+  clientID: '9c198be155c7caafd8b8',
+  clientSecret: 'e50131240f0cf6e73848e160726d174ab8a038a0',
+  repo: 'kai.ge',
+  owner: 'udbmnm',
+  admin: ['udbmnm'],
+  id: '2020-05-11 19:04:09 \x2b0800 CST',      
+  distractionFreeMode: false,  
+  title : '纯手工搭建Electron\x2bReact\x2bTypescript脚手架，无nodemon无concurrently',
+  labels : []
+});
+gitalk.render('gitalk-container')
+</script>
+
+      
+    </div>
+  </div>
+  <a id="back_to_top" href="#" class="back_to_top"><span>△</span></a>
+</div>
+<footer class="footer">
+	<div class="powered_by">
+		<a href="http://www.gohugo.io/" target="_blank">Proudly published with Hugo. </a>
+		<a href="https://github.com/zhoukai0620/hugo-theme-zozo" target="_blank">Designed by Zeuk</a>
+		<a href="http://www.beian.miit.gov.cn" target="_blank">粤ICP备16043072号-1</a>
+	</div>
+
+</footer>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?b133881eb41db2b2c6030a4257c40dcc";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script src="https://kai.ge/js/jquery-3.3.1.min.js"></script>
+<script src="https://kai.ge/js/zozo.js"></script>
+<script src="https://kai.ge/js/highlight.pack.js"></script>
+<link  href="https://kai.ge/css/fancybox.min.css" rel="stylesheet">
+<script src="https://kai.ge/js/fancybox.min.js"></script>
+
+<script>hljs.initHighlightingOnLoad()</script>
+
+
+  <script type="text/javascript" async src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+
+
+
+
+
+
+</body>
+</html>
