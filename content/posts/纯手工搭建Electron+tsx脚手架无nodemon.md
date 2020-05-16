@@ -1,6 +1,7 @@
 ---
 title: "纯手工搭建Electron+React+Typescript脚手架，无nodemon无concurrently"
 date: 2020-05-11T19:04:09+08:00
+tags: ["Electron"]
 ---
 
 最近准备开发一款软件，本来准备用Chrome Extension来实现的，考虑扩展是因为它可以无视跨域，基本上大部分需求都可以满足，并且最近我还专门去研究了Chrome扩展实现热更新的机制，发现目前百度的前端助手上已经实现了热更新，以前一直头疼的自动更新问题也可以得到解决，但是，最终我还是放弃了这个方案。
@@ -273,7 +274,6 @@ module.exports = rendererConfig;
 * https://github.com/SimulatedGREG/electron-vue
 * https://github.com/mengdu/vue-electron-chrome
 * https://github.com/ConardLi/electron-react.git
-* https://github.com/demopark/electron-api-demos-Zh_CN
 * https://github.com/Aedron/Luoo.qy
 * https://github.com/Molunerfinn/PicGo
 * https://github.com/trazyn/weweChat
