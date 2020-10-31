@@ -6,10 +6,19 @@
     <description>Recent content in BTC on 凯哥的个人网站</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 19 Aug 2017 09:24:12 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 31 Oct 2020 22:33:25 +0800</lastBuildDate>
     
 	<atom:link href="https://kai.ge/tags/btc/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>我是如何玩数字货币的？</title>
+      <link>https://kai.ge/btc/</link>
+      <pubDate>Sat, 31 Oct 2020 22:33:25 +0800</pubDate>
+      
+      <guid>https://kai.ge/btc/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>用Python分析虚拟币聊天室韭菜心理</title>

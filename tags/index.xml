@@ -6,10 +6,28 @@
     <description>Recent content in Tags on 凯哥的个人网站</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 11 May 2020 19:04:09 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 31 Oct 2020 22:33:25 +0800</lastBuildDate>
     
 	<atom:link href="https://kai.ge/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>BTC</title>
+      <link>https://kai.ge/tags/btc/</link>
+      <pubDate>Sat, 31 Oct 2020 22:33:25 +0800</pubDate>
+      
+      <guid>https://kai.ge/tags/btc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>数字货币</title>
+      <link>https://kai.ge/tags/%E6%95%B0%E5%AD%97%E8%B4%A7%E5%B8%81/</link>
+      <pubDate>Sat, 31 Oct 2020 22:33:25 +0800</pubDate>
+      
+      <guid>https://kai.ge/tags/%E6%95%B0%E5%AD%97%E8%B4%A7%E5%B8%81/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Electron</title>
@@ -80,15 +98,6 @@
       <pubDate>Wed, 29 May 2019 20:20:22 +0800</pubDate>
       
       <guid>https://kai.ge/tags/vuex/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>BTC</title>
-      <link>https://kai.ge/tags/btc/</link>
-      <pubDate>Sat, 19 Aug 2017 09:24:12 +0800</pubDate>
-      
-      <guid>https://kai.ge/tags/btc/</guid>
       <description></description>
     </item>
     

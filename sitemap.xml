@@ -3,6 +3,35 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://kai.ge/tags/btc/</loc>
+    <lastmod>2020-10-31T22:33:25+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/tags/</loc>
+    <lastmod>2020-10-31T22:33:25+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/</loc>
+    <lastmod>2020-10-31T22:33:25+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/btc/</loc>
+    <lastmod>2020-10-31T22:33:25+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kai.ge/tags/%E6%95%B0%E5%AD%97%E8%B4%A7%E5%B8%81/</loc>
+    <lastmod>2020-10-31T22:33:25+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://kai.ge/tags/electron/</loc>
     <lastmod>2020-05-11T19:04:09+08:00</lastmod>
     <priority>0</priority>
@@ -10,18 +39,6 @@
   
   <url>
     <loc>https://kai.ge/posts/</loc>
-    <lastmod>2020-05-11T19:04:09+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://kai.ge/tags/</loc>
-    <lastmod>2020-05-11T19:04:09+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://kai.ge/</loc>
     <lastmod>2020-05-11T19:04:09+08:00</lastmod>
     <priority>0</priority>
   </url>
@@ -111,12 +128,6 @@
   <url>
     <loc>https://kai.ge/about/</loc>
     <lastmod>2018-12-29T20:24:28+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kai.ge/tags/btc/</loc>
-    <lastmod>2017-08-19T09:24:12+08:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>

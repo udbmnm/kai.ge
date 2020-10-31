@@ -6,10 +6,19 @@
     <description>Recent content on 凯哥的个人网站</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 11 May 2020 19:04:09 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 31 Oct 2020 22:33:25 +0800</lastBuildDate>
     
 	<atom:link href="https://kai.ge/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>我是如何玩数字货币的？</title>
+      <link>https://kai.ge/btc/</link>
+      <pubDate>Sat, 31 Oct 2020 22:33:25 +0800</pubDate>
+      
+      <guid>https://kai.ge/btc/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>纯手工搭建Electron&#43;React&#43;Typescript脚手架，无nodemon无concurrently</title>

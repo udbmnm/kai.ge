@@ -43,6 +43,11 @@ contentdir = "content"
   identifier = "fav"
   url = "/fav"  
 [[menu.main]]
+  name = "BTC"
+  weight = 36
+  identifier = "btc"
+  url = "/btc"  
+[[menu.main]]
   name = "关于"
   weight = 40
   identifier = "about"
