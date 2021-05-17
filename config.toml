@@ -26,17 +26,17 @@ contentdir = "content"
   name = "归档"
   weight = 20
   identifier = "archive"
-  url = "/posts/"
+  url = "posts"
 [[menu.main]]
   name = "标签"
   weight = 30
   identifier = "tags"
-  url = "/tags/"
+  url = "tags"
 [[menu.main]]
   name = "读书"
   weight = 34
   identifier = "books"
-  url = "/books"  
+  url = "books"  
 [[menu.main]]
   name = "好站"
   weight = 35
@@ -46,12 +46,12 @@ contentdir = "content"
   name = "BTC"
   weight = 36
   identifier = "btc"
-  url = "/btc"  
+  url = "btc"  
 [[menu.main]]
   name = "关于"
   weight = 40
   identifier = "about"
-  url = "/about/"
+  url = "about"
 
 [params]
   subTitle = "kai.ge"                                       # site's subTitle  # 网站二级标题
