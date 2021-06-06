@@ -15,12 +15,6 @@ tags: ["网站"]
 
 [创造者日报 - 让灵感完美爆炸](https://creatorsdaily.com/)
 
-~~[前端日报](https://www.d2daily.com/)~~
-
-[个人支付接入](https://xorpay.com/)
-
-[PAYJS 微信支付个人接口](https://payjs.cn/)
-
 [免费版权图片一键搜索](https://www.logosc.cn/so/)
 
 [文叔叔 - 免注册不限速大文件传输](https://www.wenshushu.cn/)
