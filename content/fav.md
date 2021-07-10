@@ -1,15 +1,17 @@
 ---
-title: "收藏一些可能有用的网站"
+title: "收藏一些有用的东西"
 date: 2019-10-31T17:03:25+08:00
-tags: ["网站"]
+tags: ["网站","工具","收藏"]
 ---
 
-## #工具
+## 🛠 工具
 [字由 - 最好用的字体管理利器](https://www.hellofont.cn/)
 
 [找到AI - 找到你喜爱的作品](https://zhaodao.ai/)
 
 [indiehackers - 独立开发者社区](https://indiehackers.net/)
+
+[电鸭 - 远程工作者社区](https://eleduck.com/)
 
 [面包多 - 为创造者创收](https://mianbaoduo.com)
 
@@ -36,7 +38,18 @@ tags: ["网站"]
 [uTools - 你的生产力工具集](https://u.tools/)
 
 
-## #编程技术
+## 🌳 好内容
+[产品沉思录](https://index.pmthinking.com/)
+
+[王垠](http://www.yinwang.org/)
+
+[酷 壳](http://coolshell.cn/)
+
+[汤姆大叔](https://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html)
+
+[Teahour —— 聚焦于程序、创业以及一切 Geek 话题的中文播客](https://teahour.fm/)
+
+## 💻 编程技术
 [JavaScript 算法与数据结构](https://github.com/trekhleb/javascript-algorithms/blob/master/README.zh-CN.md)
 
 [如何正确的学习Node.js](https://i5ting.github.io/How-to-learn-node-correctly/)
@@ -60,10 +73,3 @@ tags: ["网站"]
 [CNode：Node.js专业中文社区](https://cnodejs.org/)
 
 [Laravel China 社区](https://learnku.com/laravel)
-
-## #博客
-[王垠](http://www.yinwang.org/)
-
-[酷 壳](http://coolshell.cn/)
-
-[汤姆大叔](https://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html)
