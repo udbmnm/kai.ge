@@ -22,6 +22,9 @@ class MyPromise {
   value = null
   // 失败之后的原因
   reason = null
+  
+  fulfilledCallbackList = []
+  rejectedCallbackList = []
 
   // 更改成功后的状态
   resolve = (value) => {
@@ -32,7 +35,13 @@ class MyPromise {
       this.status = FULFILLED
       // 保存成功之后的值
       this.value = value
-    }
+	   // ==== 新增 ====
+	  // 判断成功回调是否存在，如果存在就调用
+	  // this.onFulfilledCallback && this.onFulfilledCallback(value);
+	  while(this.fulfilledCallbackList.length){
+		this.fulfilledCallbackList.shift()(value)
+	  }
+	}
   }
 
   // 更改失败后的状态
@@ -44,6 +53,12 @@ class MyPromise {
       this.status = REJECTED
       // 保存失败后的原因
       this.reason = reason
+	  // ==== 新增 ====
+	  // 判断失败回调是否存在，如果存在就调用
+	  // this.onRejectedCallback && this.onRejectedCallback(reason)
+	  while(this.rejectedCallbackList.length){
+		  this.rejectedCallbackList.shift()(reason)
+	  }
     }
   }
 
@@ -60,10 +75,12 @@ class MyPromise {
       // ==== 新增 ====
     // 因为不知道后面状态的变化情况，所以将成功回调和失败回调存储起来
     // 等到执行成功失败函数的时候再传递
-    this.onFulfilledCallback = onFulfilled;
-    this.onRejectedCallback = onRejected;
-
+    // this.onFulfilledCallback = onFulfilled;
+    // this.onRejectedCallback = onRejected;
+		this.fulfilledCallbackList.push(onFulfilled)
+		this.rejectedCallbackList.push(onRejected)
     }
+		
   }
 }
 
@@ -75,6 +92,8 @@ const promise = new MyPromise((resolve, reject) => {
   }, 2000)
 })
 
+
+
 promise.then(
   (value) => {
     console.log('resolve', value)
@@ -83,6 +102,21 @@ promise.then(
     console.log('reject', reason)
   },
 )
+promise.then(
+  (value) => {
+    console.log('resolve2', value)
+  },
+  (reason) => {
+    console.log('reject2', reason)
+  },
+)
+
+
+
+
+
+
+
 
 //1,2,3,4,8,5,11,6,9,12,7,10,13,14,16,17,18
 //1,2,3,4,8,5,9,11,6,10,12,7,13,14,16,17,18

@@ -47,7 +47,7 @@ tags: ["网站","工具","收藏"]
 
 [汤姆大叔](https://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html)
 
-[Teahour —— 聚焦于程序、创业以及一切 Geek 话题的中文播客](https://teahour.fm/)
+[Teahour — 聚焦于程序、创业以及一切 Geek 话题的中文播客](https://teahour.fm/)
 
 ## 💻 编程技术
 [JavaScript 算法与数据结构](https://github.com/trekhleb/javascript-algorithms/blob/master/README.zh-CN.md)
