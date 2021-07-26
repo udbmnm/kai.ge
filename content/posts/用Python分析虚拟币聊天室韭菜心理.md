@@ -10,9 +10,12 @@ tags: ["BTC","python"]
 
 下面是词云的效果：
 
-![](http://ww1.sinaimg.cn/large/694a5846gy1fip5lctjrcj211y0iogr4.jpg)
+![694a5846gy1fip5lctjrcj211y0iogr4.jpg](https://cdn.steemitimages.com/DQmeKdV8S6cKX7KNX9E2fTXwNg64TS3UFYyjq5X8P1xehBQ/694a5846gy1fip5lctjrcj211y0iogr4.jpg)
 
-![](http://ww1.sinaimg.cn/large/694a5846gy1fip5leznsnj210z0g5n2k.jpg)
+
+![694a5846gy1fip5leznsnj210z0g5n2k.jpg](https://cdn.steemitimages.com/DQmNR3FAFUuydS4vjk3CLoGuBfcrFFikNxx28g9hcv6WRvB/694a5846gy1fip5leznsnj210z0g5n2k.jpg)
+
+
 
 应该是当天蚂蚁大涨，所以频率比较高，可以看出韭菜们对消息和市场的反应。。。
 
@@ -46,7 +49,8 @@ client.on('data', function onReply(data) {
 
 可以看到这里调用receive方法来处理数据，于是在receive里面动动手脚就行啦。
 
-![](http://ww1.sinaimg.cn/large/694a5846gy1fip5y6jmfbj20u30ekmza.jpg)
+![694a5846gy1fip5y6jmfbj20u30ekmza.jpg](https://cdn.steemitimages.com/DQmRJTrWk3gQPXAmgcuANBkzAfm79jGYtJzEqctvBHryu8Q/694a5846gy1fip5y6jmfbj20u30ekmza.jpg)
+
 
 可以看到我这里每次就是到消息就发送一个POST到本地http://localhost/msg，这样抓取数据就写好了
 
@@ -54,7 +58,8 @@ localhost里面的代码就很简单了，保存post到mysql，最后是Python�
 
 这一步也很简单，才几行代码，哈哈哈。。。
 
-![](http://ww1.sinaimg.cn/large/694a5846gy1fip5y6ztxbj20uv0ar0tm.jpg)
+![694a5846gy1fip5y6ztxbj20uv0ar0tm.jpg](https://cdn.steemitimages.com/DQmPfnVch25bbMrfCnBBnokfho2jxu7HfaCWpL2ex3WdaKb/694a5846gy1fip5y6ztxbj20uv0ar0tm.jpg)
+
 
 这里需要注意如果你的文本是中文需要引入支持中文的字体，我这里引入的微软自带的字体
 

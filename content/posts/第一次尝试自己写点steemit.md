@@ -5,7 +5,9 @@ tags: ["steemit"]
 ---
 
 
-![](http://ww1.sinaimg.cn/large/694a5846gy1fispwmt3bvg20b40b4kfa.gif)
+
+![694a5846gy1fispwmt3bvg20b40b4kfa.gif](https://cdn.steemitimages.com/DQmbULwiL3mMjio3Emt31KZep1ZyubdEr559hu8qT1mYFg9/694a5846gy1fispwmt3bvg20b40b4kfa.gif)
+
 
 今天尝试自己写点东西吧，写作水平很差，毕业以后就没正经写过文章。。。
 
