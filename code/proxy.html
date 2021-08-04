@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+		"use strict"
+			var obj = {
+				a: 1,
+				b:2,
+				c: {}
+			}
+			
+			var proxyObj = new Proxy(obj,{
+				get(target, property, receiver) {
+					debugger
+					return target[property]
+				},
+				set(target, property, receiver) {
+					debugger
+					target[property] = receiver
+					return false;
+				}
+			})
+			
+			console.log(proxyObj.a)
+			proxyObj.c.d = 1
+			
+		</script>
+	</body>
+</html>

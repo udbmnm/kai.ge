@@ -11,9 +11,9 @@ googleAnalytics = ""                 # your google analytics id
 disqusShortname = ""                 # your discuss shortname
 publishdir = "public"
 contentdir = "content"
+preserveTaxonomyNames = true
 [author]                             # essential                     # 必需
   name = "凯哥"
-
 [blackfriday]
   smartypants = false
 
