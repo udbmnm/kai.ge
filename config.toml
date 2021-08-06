@@ -24,7 +24,7 @@ uglyurls = true
   name = "首页"
   weight = 10
   identifier = "home"
-  url = "/"
+  url = "/index"
 [[menu.main]]
   name = "归档"
   weight = 20
