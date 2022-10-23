@@ -39,17 +39,12 @@ uglyurls = true
   name = "读书"
   weight = 34
   identifier = "books"
-  url = "/books"  
+  url = "/books"
 [[menu.main]]
-  name = "好站"
+  name = "收藏"
   weight = 35
   identifier = "fav"
-  url = "/fav"  
-[[menu.main]]
-  name = "BTC"
-  weight = 36
-  identifier = "btc"
-  url = "/btc"  
+  url = "/fav"
 [[menu.main]]
   name = "关于"
   weight = 40
@@ -66,7 +61,7 @@ uglyurls = true
   enableMathJax = true                                                 # enable mathjax  # 是否使用mathjax（数学公式）
 
   enableSummary = true                                                 # display the article summary  # 是否显示文章摘要
-  
+
 # Valine.
 # You can get your appid and appkey from https://leancloud.cn
 # more info please open https://valine.js.org
