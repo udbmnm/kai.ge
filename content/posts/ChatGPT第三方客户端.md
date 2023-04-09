@@ -22,8 +22,10 @@ ChatGPT 目前估计已经无人不知，无人不晓了，各种相关产品正
 * https://saasprompts.co
 * https://openprompt.co
 * https://github.com/f/awesome-chatgpt-prompts —— 这个star数有点多，prompt 很多
-* https://github.com/PlexPt/awesome-chatgpt-prompts-zh ChatGPT 中文调教指南
-* https://github.com/yzfly/awesome-chatgpt-zh ChatGPT 中文指南
+* https://github.com/PlexPt/awesome-chatgpt-prompts-zh —— ChatGPT 中文调教指南
+* https://github.com/yzfly/awesome-chatgpt-zh —— ChatGPT 中文指南
+* https://github.com/thinkingjimmy/Learning-Prompt
+* https://github.com/Moonvy/OpenPromptStudio —— AIGC 提示词可视化编辑器
 
 ## 相关产品
 
