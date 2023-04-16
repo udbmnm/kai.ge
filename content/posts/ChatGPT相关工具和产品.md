@@ -36,3 +36,5 @@ ChatGPT 目前估计已经无人不知，无人不晓了，各种相关产品正
 * https://github.com/arc53/DocsGPT —— 开源文档助手
 * https://www.cursor.so —— 基于 GPT4 的代码编辑器
 * https://www.bookai.chat 和任意一本书聊天
+* https://flowgpt.com prompts 社区，可以直接使用ChatGPT
+* https://beta.character.ai 类 ChatGPT 对话机器人社区

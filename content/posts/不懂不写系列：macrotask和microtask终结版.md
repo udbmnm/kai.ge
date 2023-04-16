@@ -32,7 +32,7 @@ console.log('script end');
 
 ![event-loop.jpg](https://cdn.steemitimages.com/DQmUyZ7SruH55V1TunUpaCLXqG4iYaat7WEoSdBpoLUYa5o/event-loop.jpg)
 
-几秒钟过后...... 
+几秒钟过后......
 
 
 好了，可以直观的看出图中包含三个主要的概念：
@@ -87,7 +87,7 @@ foo();
 ![](https://cdn.steemitimages.com/DQmStyEA5rYjaWeGLRbpxuMAs6uY21nLS2n4xwbb2fEsKAY/image.png)
 
 
-#   
+#
 
 回顾完上面的基础概念后，下面开始本文的主要内容。
 # [Event Loop是什么？](https://html.spec.whatwg.org/multipage/webappapis.html#event-loop)
@@ -107,7 +107,7 @@ foo();
   while (queue.waitForMessage()) {
     queue.processNextMessage();
   }
-  
+
 ```
 
 并且还有"`执行至完成`"的特点：
@@ -353,7 +353,7 @@ export function nextTick (cb?: Function, ctx?: Object) {
       _resolve = resolve
     })
   }
-}	
+}
 
 ```
 
@@ -362,7 +362,7 @@ Vue2.5对于 macrotask 的实现，优先检测是否支持原生setImmediate，
 ### 再来看看Vue.js 2.6版本的实现：
 
 ```
-	
+
 if (typeof Promise !== 'undefined' && isNative(Promise)) {
   const p = Promise.resolve()
   timerFunc = () => {
@@ -467,8 +467,8 @@ Vue对于$nextTick的实现改动了很多的版本，据我所知 Vue.js 2.5版
 └──┤      close callbacks      │
    └───────────────────────────┘
 ```
-   
-   
+
+
 * timers : 这个阶段执行setTimeout(callback) 和 setInterval(callback)预定的callback
 * I/O callbacks : 执行延迟到下一个循环迭代的 I/O 回调
 * idle, prepare : 仅node内部使用
@@ -477,7 +477,7 @@ Vue对于$nextTick的实现改动了很多的版本，据我所知 Vue.js 2.5版
 * close callbacks : 一些准备关闭的回调函数，如：socket.on('close'，callback)
 
 在每次运行的事件循环之间，Node.js 检查它是否在等待任何异步 I/O 或计时器，如果没有的话就干净的关闭。
-  
+
 ⚠️`注意上面六个阶段都不包括 process.nextTick()`
 
 
@@ -603,7 +603,7 @@ button.addEventListener('click', function CB1() {
 # 后记
 
 ----
- 
+
  由于JavaScript异步机制涉及内容太多，给我的感觉就是越写需要研究的东西越多，我会在适当时机更新，如有大佬发现有误的地方欢迎交流。
 
 
