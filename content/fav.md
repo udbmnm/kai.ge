@@ -73,3 +73,7 @@ tags: ["网站","工具","收藏"]
 [CNode：Node.js专业中文社区](https://cnodejs.org/)
 
 [Laravel China 社区](https://learnku.com/laravel)
+
+[Rust语言圣经(Rust Course)](https://course.rs/about-book.html)
+
+
