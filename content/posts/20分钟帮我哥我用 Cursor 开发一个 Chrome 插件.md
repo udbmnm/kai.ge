@@ -73,4 +73,6 @@ tags: ["cursor","AI 编程","Chrome 插件","coverbox","Claude 3.5"]
 
 OK，今天就写到这里吧，后面有新的 AI 编程体验再来分享。
 
-Chrome 插件的 GitHub 项目地址：https://github.com/udbmnm/coverbox-download
+Chrome 插件的 GitHub 项目地址：
+
+https://github.com/udbmnm/coverbox-download
